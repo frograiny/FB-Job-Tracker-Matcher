@@ -1,0 +1,9 @@
+# Facebook Job Scraper Bot - Dependencies
+playwright
+playwright-stealth
+google-genai
+python-dotenv
+fastapi
+uvicorn
+pypdf
+

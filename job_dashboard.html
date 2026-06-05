@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Job Tracker & CV Matcher</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js for client-side PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+    
+    <style>
+        :root {
+            --bg-primary: #090d16;
+            --bg-secondary: #111726;
+            --bg-card: #151d30;
+            --bg-card-hover: #1b263e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #2563eb;
+            --accent-hover: #3b82f6;
+            --accent-glow: rgba(37, 99, 235, 0.25);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --glow-green: rgba(16, 185, 129, 0.12);
+            --glow-yellow: rgba(245, 158, 11, 0.12);
+            --glow-red: rgba(239, 68, 68, 0.12);
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.3);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        .light-mode {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-card-hover: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent: #1d4ed8;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(29, 78, 216, 0.15);
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --glow-green: rgba(5, 150, 105, 0.08);
+            --glow-yellow: rgba(217, 119, 6, 0.08);
+            --glow-red: rgba(220, 38, 38, 0.08);
+            --shadow-sm: 0 2px 8px rgba(148, 163, 184, 0.1);
+            --shadow-md: 0 8px 24px rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            padding-bottom: 30px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1550px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Top Bar Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 18px 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo-section h1 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-section p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-top: 3px;
+        }
+
+        .actions-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 6px 18px var(--accent-glow);
+            color: #ffffff;
+        }
+
+        /* 3-Column Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 340px 420px 1fr;
+            gap: 20px;
+            height: calc(100vh - 150px);
+            min-height: 700px;
+        }
+
+        @media (max-width: 1280px) {
+            .dashboard-grid {
+                grid-template-columns: 320px 1fr;
+                height: auto;
+            }
+            .job-details-view {
+                grid-column: span 2;
+                position: static !important;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .job-details-view {
+                grid-column: span 1;
+            }
+        }
+
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Custom Scrollbar */
+        .panel-body::-webkit-scrollbar {
+            width: 5px;
+        }
+        .panel-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .panel-body::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        .panel-body::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        /* Stats in Sidebar */
+        .sidebar-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-item-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stat-item-val {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* CV Upload Area */
+        .cv-upload-box {
+            border: 2px dashed var(--border-hover);
+            border-radius: var(--radius-md);
+            padding: 24px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+        }
+
+        .cv-upload-box:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+        }
+
+        .cv-upload-box i {
+            font-size: 2.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .cv-text-preview {
+            width: 100%;
+            height: 120px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            resize: none;
+            outline: none;
+        }
+
+        .cv-text-preview:focus {
+            border-color: var(--accent);
+        }
+
+        /* Job Cards Column */
+        .jobs-list-panel {
+            gap: 12px;
+            padding: 16px !important;
+        }
+
+        .job-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .job-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .job-card.active {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .job-card-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .job-card-company {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .job-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .job-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .job-card-meta i {
+            color: var(--accent);
+        }
+
+        .badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .score-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .score-badge.high { background: var(--glow-green); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.25); }
+        .score-badge.mid { background: var(--glow-yellow); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.25); }
+        .score-badge.low { background: var(--glow-red); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.25); }
+
+        .new-match-indicator {
+            font-size: 0.7rem;
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Right Column: Detailed View */
+        .job-details-view {
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .empty-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            gap: 15px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-details i {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+
+        .details-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .details-title-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .details-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            background: var(--bg-primary);
+            padding: 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .details-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .details-meta-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .details-meta-text h4 {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .details-meta-text p {
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .details-body {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .details-section-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .details-section-title i {
+            color: var(--accent);
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .skill-tag.matched {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .skill-tag.missing {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .ai-box {
+            background: var(--accent-glow);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        /* Config Modal / Key input */
+        .api-key-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Form styling */
+        label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <header>
+            <div class="logo-section">
+                <h1><i class="fa-brands fa-facebook"></i> FB Job Tracker & Matcher</h1>
+                <p>Hệ thống lọc tin tuyển dụng và đối khớp CV thời gian thực</p>
+            </div>
+            <div class="actions-section">
+                <button class="btn btn-primary" id="scrape-btn">
+                    <i class="fa-solid fa-arrows-rotate"></i> <span>Quét tin Facebook mới</span>
+                </button>
+                <button class="btn" id="theme-btn">
+                    <i class="fa-solid fa-moon"></i> <span>Giao diện</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Layout Grid -->
+        <div class="dashboard-grid">
+            
+            <!-- Column 1: CV Management & Filters -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title"><i class="fa-solid fa-address-card"></i> Hồ sơ & Bộ lọc</span>
+                </div>
+                <div class="panel-body">
+                    <!-- Statistics summary -->
+                    <div class="sidebar-stats">
+                        <div class="stat-item">
+                            <span class="stat-item-label">Tổng bài viết</span>
+                            <span class="stat-item-val" id="stat-scraped">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-label">Đã tìm thấy job</span>
+                            <span class="stat-item-val" id="stat-jobs">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-label">Match score trung bình</span>
+                            <span class="stat-item-val" id="stat-match">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload CV section -->
+                    <div class="filter-group">
+                        <label>Tải CV của bạn lên để chấm điểm lại</label>
+                        <div class="cv-upload-box" id="upload-box">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Tải lên CV (.pdf, .txt)</p>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Click hoặc kéo thả file vào đây</p>
+                            <input type="file" id="file-input" accept=".txt,.pdf" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Paste CV text area -->
+                    <div class="filter-group">
+                        <label for="cv-textarea">Nội dung văn bản CV</label>
+                        <textarea id="cv-textarea" class="cv-text-preview" placeholder="Dán nội dung CV tiếng Việt hoặc tiếng Anh của bạn tại đây để đối khớp tự động..."></textarea>
+                    </div>
+
+                    <!-- Text Keyword search -->
+                    <div class="filter-group">
+                        <label for="search-input">Tìm kiếm nhanh</label>
+                        <input type="text" id="search-input" class="input-control" placeholder="Công ty, vị trí, kỹ năng...">
+                    </div>
+
+                    <!-- Match score slider -->
+                    <div class="filter-group">
+                        <label for="min-score-range">Match Score tối thiểu: <span id="score-val" style="color:var(--accent); font-weight:700;">0%</span></label>
+                        <input type="range" id="min-score-range" class="input-control" min="0" max="100" value="0">
+                    </div>
+
+                    <!-- Level Select dropdown -->
+                    <div class="filter-group">
+                        <label for="level-select">Cấp bậc (Level)</label>
+                        <select id="level-select" class="input-control">
+                            <option value="">Tất cả</option>
+                            <option value="intern">Intern / Thực tập</option>
+                            <option value="fresher">Fresher</option>
+                            <option value="junior">Junior</option>
+                            <option value="mid">Mid-level</option>
+                        </select>
+                    </div>
+
+                    <!-- Scrape status log console -->
+                    <div id="scrape-status-container" style="display: none; background: rgba(37, 99, 235, 0.08); border: 1px solid var(--accent); padding: 12px; border-radius: var(--radius-md);">
+                        <label style="color: var(--accent);"><i class="fa-solid fa-circle-notch fa-spin"></i> Tiến trình quét tin...</label>
+                        <div id="scrape-log-console" style="font-family: monospace; font-size: 0.72rem; line-height: 1.4; color: var(--text-secondary); max-height: 120px; overflow-y: auto; margin-top: 6px; white-space: pre-wrap;">
+                        </div>
+                    </div>
+
+                    <!-- Gemini API Key panel -->
+                    <div class="api-key-section">
+                        <label for="api-key-input"><i class="fa-solid fa-key"></i> Gemini API Key (Không bắt buộc)</label>
+                        <input type="password" id="api-key-input" class="input-control" placeholder="Nhập để chấm điểm AI trực tiếp...">
+                        <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.3;">
+                            Key được lưu cục bộ ở trình duyệt của bạn (localStorage), dùng để phân tích tin tuyển dụng trực tiếp bằng AI.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Job Cards list -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title"><i class="fa-solid fa-briefcase"></i> Tin tuyển dụng</span>
+                    <span class="stat-item-label" id="jobs-count">0 tin</span>
+                </div>
+                <div class="panel-body jobs-list-panel" id="jobs-list">
+                    <!-- Cards will be dynamically rendered -->
+                </div>
+            </div>
+
+            <!-- Column 3: Detailed Job Description -->
+            <div class="panel job-details-view" id="job-details">
+                <div class="empty-details">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <h3>Vui lòng chọn một công việc bên danh sách để xem chi tiết</h3>
+                    <p>Bộ đối khớp CV sẽ tự động tính điểm dựa trên hồ sơ của bạn</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Embedded data -->
+    <script>
+        const JOBS_DATA = [{"id": 48, "post_hash": "0b83282b74d2557985247baa492c5aea", "company": null, "position": "AI Intern, AI Engineer", "requirements": ["Học chuyên ngành CNTT, AI, Khoa học máy tính, Toán tin, Điện tử viễn thông, Kỹ thuật phần mềm", "Kiến thức cơ bản về Python", "Kiến thức về Machine Learning / Deep Learning", "Kinh nghiệm xử lý dữ liệu hoặc LLM là một lợi thế"], "salary": "Intern 3-5M, AI Engineer lương hấp dẫn", "location": "15 Phạm Hùng, Tòa Toyota Mỹ Đình, Hà Nội", "contact": "0978907393 (ZL Thanh Chúc HR)", "deadline": null, "work_type": "fulltime", "experience_level": "intern/fresher", "match_score": 95, "matched_skills": ["Python", "Machine Learning", "Deep Learning", "LLM & Agent Engineering", "Computer Science background"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí AI Engineer (Fresher). CV thể hiện kỹ năng chuyên sâu về LLM, Agentic Workflows và Deep Learning, vượt xa yêu cầu cơ bản của tin tuyển dụng. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:49"}, {"id": 39, "post_hash": "3b8c03f8a6ac3a445eba89be37120808", "company": "DBPLUS", "position": "AI Software Developer", "requirements": ["6 tháng kinh nghiệm software development hoặc AI-related projects", "Thành thạo Python, biết Flask/FastAPI", "Kinh nghiệm làm việc với API, JSON, data handling", "Ít nhất 01 project liên quan đến AI", "Tư duy xử lý vấn đề và debugging tốt"], "salary": "Thỏa thuận theo năng lực", "location": "Cát Lái, TP.HCM", "contact": "Inbox người đăng bài (Thư Lê)", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior", "match_score": 95, "matched_skills": ["Python", "FastAPI/Flask", "AI/Deep Learning (PyTorch/TensorFlow)", "LLM & Agent Engineering", "JSON/Data handling", "Docker"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Các dự án cá nhân (AI Security WAF, Autonomous AI Agent) đáp ứng vượt mức yêu cầu về kinh nghiệm AI và kỹ năng kỹ thuật. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:11"}, {"id": 29, "post_hash": "7af9989b744040ebb0c2133f566d849f", "company": "PLAN-B TECHNOLOGIES VIỆT NAM", "position": "Intern Backend Software Engineer", "requirements": ["Sử dụng Python"], "salary": null, "location": "Hà Nội", "contact": null, "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "Backend Development", "FastAPI", "Flask", "REST API Design"], "missing_skills": [], "recommendation": "Ứng viên rất phù hợp với vị trí này. Kỹ năng Python và kinh nghiệm xây dựng hệ thống Backend của ứng viên vượt xa yêu cầu cơ bản của một vị trí Intern. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:27"}, {"id": 25, "post_hash": "656af2e52f063ba098964e5713928ad5", "company": null, "position": "Intern Web Dev (Python)", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "Python", "Web Development", "Database"], "salary": null, "location": "Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "Web Development", "FastAPI", "Flask", "SQL"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp. Bạn đang là sinh viên năm 3-4 với nền tảng Python và Web Development rất mạnh (FastAPI, Flask, SQL). Bạn nên ứng tuyển ngay vì kỹ năng của bạn vượt xa yêu cầu cơ bản của một vị trí thực tập sinh.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:10:10"}, {"id": 23, "post_hash": "1c7cf9124e976c194a55d446d82a3690", "company": "LOZIDO", "position": "Python Intern", "requirements": ["Sinh viên năm cuối hoặc tốt nghiệp chuyên ngành CNTT", "Có kiến thức cơ bản về Python", "Tinh thần học hỏi, chủ động và có trách nhiệm"], "salary": "Hỗ trợ phụ cấp", "location": "201/15 Lê Văn Việt, Thủ Đức, TP.HCM", "contact": "doanvanquoc123@gmail.com", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "Sinh viên năm cuối (2026)", "Kiến thức chuyên ngành CNTT"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng Python và nền tảng AI/Web của ứng viên vượt xa yêu cầu cơ bản của một vị trí Intern. Rất khuyến khích ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:10:03"}, {"id": 21, "post_hash": "8ae0e25e03c136dce5fdc61d2481e6a5", "company": null, "position": "AI Intern, AI Engineer", "requirements": ["Học các chuyên ngành CNTT", "Trí tuệ nhân tạo (AI)", "Khoa học máy tính"], "salary": null, "location": null, "contact": null, "deadline": null, "work_type": "intern/fulltime", "experience_level": "intern/fresher", "match_score": 95, "matched_skills": ["Artificial Intelligence & Machine Learning", "Python", "Deep Learning (PyTorch, TensorFlow)", "Model Fine-tuning", "Agentic Workflows"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí AI Intern/Fresher. CV thể hiện nền tảng học vấn đúng chuyên ngành và các dự án thực tế về AI/Deep Learning rất ấn tượng. Nên ứng tuyển ngay.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:55"}, {"id": 20, "post_hash": "cef71f250781fbe65fbcfb7e49e0f377", "company": "KIAISOFT", "position": "Intern Web Dev Python", "requirements": ["Sinh viên IT năm 3, 4 hoặc sắp tốt nghiệp", "Định hướng Backend/Python"], "salary": null, "location": "Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": "Fulltime hoặc Parttime", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "Web Development", "FastAPI/Flask", "Database/SQL"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng Python và Web Development của ứng viên vượt xa yêu cầu cơ bản của một thực tập sinh. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:52"}, {"id": 19, "post_hash": "3062d136c67b30e6b9b2f2e3ab39e127", "company": null, "position": "Intern Web Dev (Python)", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "GPA >= 3.2", "Nền tảng Web cơ bản", "Tư duy logic, chủ động học hỏi", "Biết Git", "Đã từng làm project Python"], "salary": "Trợ cấp", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox Facebook", "deadline": null, "work_type": "Fulltime hoặc >= 5 buổi/tuần", "experience_level": "Intern", "match_score": 95, "matched_skills": ["Python", "Web Development", "Git", "Project Python (AI Security WAF, Recruitment AI Agent)"], "missing_skills": ["Thông tin GPA không được đề cập trong CV"], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng kỹ thuật của ứng viên (Python, Web, AI, Git) vượt xa yêu cầu của một vị trí Intern. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:48"}, {"id": 15, "post_hash": "b6389afb73195d126a76cd0f3e1460df", "company": null, "position": "AI Intern, AI Engineer", "requirements": ["Học chuyên ngành CNTT (AI, Khoa học máy tính, Toán tin, Điện tử viễn thông, Kỹ thuật phần mềm)", "Kiến thức cơ bản về Python", "Kiến thức về Machine Learning / Deep Learning", "Kinh nghiệm về Xử lý dữ liệu hoặc LLM là một lợi thế"], "salary": "Intern 3-5M, lương AI Engineer hấp dẫn", "location": "15 Phạm Hùng, Tòa Toyota Mỹ Đình, Hà Nội", "contact": "0978907393 (ZL Thanh Chúc HR)", "deadline": null, "work_type": "fulltime", "experience_level": "intern/fresher", "match_score": 95, "matched_skills": ["Python", "Machine Learning", "Deep Learning", "LLM & Agent Engineering", "Chuyên ngành Khoa học máy tính"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí AI Engineer (Fresher) hoặc AI Intern. CV thể hiện nền tảng kỹ thuật mạnh về AI, LLM và các dự án thực tế, vượt xa yêu cầu cơ bản của tin tuyển dụng. Rất khuyến khích ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:33"}, {"id": 14, "post_hash": "5e1b32a00285a2964f64cf06ab69b3f0", "company": "KIAISOFT", "position": "Intern Web Dev Python", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "Định hướng Backend/Python", "GPA >= 3.2", "Nền tảng Web cơ bản", "Tư duy logic tốt", "Chủ động học hỏi, teamwork tốt", "Biết Git hoặc đã làm project Python"], "salary": "Trợ cấp + hỗ trợ dự án", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox để nhận JD chi tiết", "deadline": null, "work_type": "Fulltime hoặc Parttime", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "Web Development (FastAPI, Flask, React)", "Git", "Project thực tế (AI Security, Recruitment AI Agent)"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng Python và kinh nghiệm làm dự án thực tế vượt xa yêu cầu của một thực tập sinh. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:30"}, {"id": 10, "post_hash": "cdbfe86f772f8e035837749939670466", "company": "Seprinder", "position": "Python Intern", "requirements": ["Sinh viên năm cuối chuyên ngành CNTT", "Có kiến thức về cấu trúc lập trình backend", "Tinh thần học hỏi, chủ động và có trách nhiệm"], "salary": "Hỗ trợ phụ cấp", "location": "Trần Thánh Tông, phường Tân Sơn, TP.HCM", "contact": "truong0vanchien@gmail.com", "deadline": null, "work_type": "parttime", "experience_level": "intern", "match_score": 95, "matched_skills": ["Python", "FastAPI", "Flask", "Backend Development", "Computer Science student"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng Python và kinh nghiệm làm việc với FastAPI/Flask của ứng viên vượt xa yêu cầu cơ bản của một vị trí Intern. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:10"}, {"id": 9, "post_hash": "6af69d8f8b8728a35069155f2247c0cc", "company": "KIAISOFT", "position": "Intern Web Dev (Python)", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "Có khả năng làm việc T2 – T6 (Fulltime hoặc ≥ 5 buổi/tuần)", "Kiến thức cơ bản về Python, Web, Database"], "salary": null, "location": "Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": "Fulltime/Parttime", "experience_level": "Intern", "match_score": 95, "matched_skills": ["Python", "Web Development (FastAPI, Flask, React)", "Database (SQL)", "Sinh viên năm 3, 4 (Dự kiến tốt nghiệp 2026)"], "missing_skills": [], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng của ứng viên vượt xa yêu cầu cơ bản của một thực tập sinh. Nên ứng tuyển ngay vì ứng viên có nền tảng vững chắc về Python và Web Development.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:06"}, {"id": 4, "post_hash": "316f44093c3ca2b466f61f35d4087fcd", "company": "KIAISOFT", "position": "Intern Web Dev (Python)", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "GPA >= 3.2", "Nền tảng Web cơ bản", "Tư duy logic, chủ động học hỏi", "Biết Git là lợi thế", "Lên công ty 5 buổi/tuần"], "salary": "Trợ cấp + hỗ trợ dự án", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox Facebook", "deadline": null, "work_type": "Fulltime/Parttime", "experience_level": "Intern", "match_score": 95, "matched_skills": ["Python", "Web Development (FastAPI, Flask, React)", "Git", "Database/SQL", "Tư duy logic (thể hiện qua các dự án AI/Security)"], "missing_skills": ["GPA cụ thể (chưa được đề cập trong CV)"], "recommendation": "Ứng viên cực kỳ phù hợp với vị trí này. Kỹ năng kỹ thuật của ứng viên vượt xa yêu cầu cơ bản của một thực tập sinh. Nên ứng tuyển ngay và nhấn mạnh vào các dự án thực tế đã thực hiện.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:39"}, {"id": 44, "post_hash": "67754ace25d52311c040648bee1175dc", "company": "DBPLUS", "position": "AI Software Developer", "requirements": ["6 tháng kinh nghiệm software development", "Phát triển, tích hợp AI features vào web/app", "Làm việc với AI APIs như OpenAI API", "Xây dựng backend service bằng Python", "Xử lý dữ liệu đầu vào: text, file, database", "Test, debug và tối ưu hiệu năng hệ thống"], "salary": null, "location": "Cát Lái, TP.HCM", "contact": null, "deadline": null, "work_type": null, "experience_level": "fresher/junior", "match_score": 90, "matched_skills": ["Python", "AI/ML Development", "Web Application Development", "FastAPI/Flask", "Backend Architecture", "Data Processing"], "missing_skills": ["Kinh nghiệm làm việc thực tế (6 tháng)", "Kinh nghiệm cụ thể với OpenAI API (dù ứng viên có kinh nghiệm với Google Antigravity SDK)"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng AI/ML mạnh mẽ và kỹ năng phát triển backend. Mặc dù ứng viên là sinh viên sắp tốt nghiệp, các dự án cá nhân (đặc biệt là AI Agent) chứng minh năng lực vượt trội so với yêu cầu Fresher/Junior. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:30"}, {"id": 42, "post_hash": "36deb5f193c4724aa66a677b8d99ce7c", "company": "CÔNG TY CỔ PHẦN TECHLEAD", "position": "Fresher AI", "requirements": ["6 tháng – 1 năm kinh nghiệm làm việc với AI/ML hoặc các dự án liên quan", "Có kinh nghiệm sử dụng API của LLM (OpenAI hoặc tương đương)", "Có kiến thức cơ bản về: Python hoặc nodejs/ REST API", "Hiểu cơ bản về: Prompt Engineering/ API, xử lý dữ liệu/ Chatbot flow / conversation design", "Đã từng làm ít nhất 1 project AI thực tế"], "salary": "upto 12M", "location": null, "contact": null, "deadline": null, "work_type": "fulltime", "experience_level": "fresher", "match_score": 90, "matched_skills": ["Python", "LLM & Agent Engineering", "Prompt Engineering", "REST API Design", "AI/ML Projects (Autonomous Job Application AI Agent)"], "missing_skills": ["Kinh nghiệm làm việc với LangChain", "Kinh nghiệm làm việc với MCP (Model Context Protocol)"], "recommendation": "Ứng viên rất phù hợp với vị trí Fresher AI. Dự án 'Autonomous Job Application & Recruitment AI Agent' của ứng viên chứng minh khả năng thực tế về AI Agent và LLM. Nên ứng tuyển ngay vì kỹ năng của ứng viên vượt xa yêu cầu cơ bản của một Fresher.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:22"}, {"id": 40, "post_hash": "8713088302cfc7cbce50002703cb4f7d", "company": "SOTATEK", "position": "AI Engineer / AI Solution Provider – Computer Vision", "requirements": ["Đam mê AI", "Khả năng biến yêu cầu khách hàng thành sản phẩm thực tế"], "salary": null, "location": "Golden Park Tower Số 2 Phạm Văn Bạch, Cầu Giấy, Hà Nội", "contact": "duy.hoang@sotatek.com", "deadline": null, "work_type": "intern/fresher/junior/mid/senior", "experience_level": "All levels", "match_score": 90, "matched_skills": ["Python", "Deep Learning", "Computer Vision", "OpenCV", "AI/ML"], "missing_skills": ["Chưa có kinh nghiệm làm việc thực tế tại doanh nghiệp (đang là sinh viên)"], "recommendation": "Ứng viên rất phù hợp với vị trí Intern/Fresher AI Engineer. Dự án AI Security và Autonomous AI Agent cho thấy khả năng thực thi dự án thực tế tốt. Nên ứng tuyển ngay qua email được cung cấp.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:15"}, {"id": 33, "post_hash": "d4ffde8ccc44122b628d7f186c5aa9af", "company": "VIETMAP", "position": "Fresher/Junior Developer", "requirements": ["Python", ".NET/C#", "SQL", "Git"], "salary": "upto 12tr", "location": "TP.HCM", "contact": null, "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior", "match_score": 90, "matched_skills": ["Python", "C#", "SQL", "Git"], "missing_skills": [], "recommendation": "Ứng viên rất phù hợp với vị trí này vì sở hữu đầy đủ các kỹ năng cốt lõi yêu cầu (Python, C#, SQL, Git). Với nền tảng về AI và xử lý dữ liệu, ứng viên hoàn toàn có khả năng đáp ứng tốt các bài toán về thuật toán kẹt xe và xử lý dữ liệu hành trình của VIETMAP. Rất khuyến khích ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:42"}, {"id": 32, "post_hash": "1b8e2c71a8a635d6abbe40f2975bd774", "company": "PATHTECH", "position": "Junior DevOps, AI Engineer (Model Training)", "requirements": ["0–2 năm kinh nghiệm hoặc mới ra trường", "Chủ động, chịu khó học hỏi", "Kỹ năng triển khai hệ thống, train model, xử lý dữ liệu"], "salary": null, "location": "Cầu Giấy, Hà Nội", "contact": "hr@pathtech.ai", "deadline": null, "work_type": "full-time, onsite", "experience_level": "junior/fresher", "match_score": 90, "matched_skills": ["Python", "AI/Deep Learning", "Model Fine-tuning", "Docker", "Linux Systems", "System Architecture"], "missing_skills": ["Kinh nghiệm làm việc thực tế (chưa tốt nghiệp)", "Kỹ năng DevOps chuyên sâu (CI/CD pipelines cụ thể)"], "recommendation": "Ứng viên rất phù hợp với vị trí AI Engineer nhờ nền tảng Deep Learning và dự án AI Security thực tế. Nên ứng tuyển ngay vì hồ sơ đáp ứng tốt yêu cầu về kỹ năng kỹ thuật cho vị trí Junior/Fresher.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:38"}, {"id": 28, "post_hash": "792df6fb20dca6c002b4e155da945b8b", "company": "BlueOC", "position": "Fresher Fullstack (ReactJS / NodeJS / Python), Fresher C++ Developer, Fresher .NET Developer, Fresher QA / Tester", "requirements": ["Sinh viên mới tốt nghiệp hoặc fresher IT", "Tiếng Anh giao tiếp tốt"], "salary": "Up to 15M Gross", "location": "Technopark – Gia Lâm, Hà Nội", "contact": "hr@blueoc.vn", "deadline": null, "work_type": "fulltime", "experience_level": "fresher", "match_score": 90, "matched_skills": ["Python", "React", "C++", "Software Architecture"], "missing_skills": ["Tiếng Anh giao tiếp (chưa được đề cập trong CV)", "NodeJS (chưa liệt kê cụ thể)", ".NET (chưa liệt kê cụ thể)"], "recommendation": "Ứng viên rất phù hợp với vị trí Fresher Fullstack hoặc C++ Developer. CV thể hiện nền tảng kỹ thuật mạnh mẽ và các dự án thực tế ấn tượng. Nên ứng tuyển và nhấn mạnh khả năng giao tiếp tiếng Anh trong email gửi HR.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:24"}, {"id": 24, "post_hash": "180245f1644d024c42dc451a142e93bf", "company": "LTS Group", "position": "Thực tập sinh AI (Intern AI)", "requirements": ["Sinh viên năm 4 hoặc mới tốt nghiệp ngành CNTT, Khoa học dữ liệu, AI hoặc liên quan", "Giao tiếp tiếng anh tốt", "Có kiến thức cơ bản về Python, Machine Learning", "Tư duy logic tốt, ham học hỏi"], "salary": "Hỗ trợ phụ cấp thực tập", "location": "Hà Nội", "contact": "diepnn@ltsgroup.tech", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "Machine Learning", "Deep Learning", "AI Agent Engineering", "Sinh viên năm 4 (tốt nghiệp 2026)"], "missing_skills": ["Chứng chỉ hoặc bằng chứng cụ thể về khả năng giao tiếp tiếng Anh"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật mạnh về AI và Machine Learning. Nên ứng tuyển ngay, lưu ý nhấn mạnh khả năng giao tiếp tiếng Anh trong email gửi kèm CV.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:10:06"}, {"id": 17, "post_hash": "2ab00704401fa0489129be501a8e0fe4", "company": null, "position": "Intern Web Dev (Python)", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "GPA >= 3.2", "Nền tảng Web cơ bản", "Tư duy logic, chủ động học hỏi", "Biết Git là lợi thế", "Ưu tiên đã từng làm project Python"], "salary": "Trợ cấp + hỗ trợ dự án", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox trực tiếp qua Facebook", "deadline": null, "work_type": "Intern", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "Web Development (FastAPI, Flask, React)", "Git", "Project Python thực tế"], "missing_skills": ["Thông tin về GPA trong CV", "Yêu cầu về trường đại học (HUST, UET, PTIT...)"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ kinh nghiệm thực tế với Python và Web Development. Nên ứng tuyển ngay, lưu ý bổ sung thông tin GPA và xác nhận xem trường ĐH Khoa học Tự nhiên có nằm trong danh sách ưu tiên của nhà tuyển dụng hay không.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:41"}, {"id": 16, "post_hash": "e991c3e286224f6dcbdf921d2eae9b96", "company": "Seprinder", "position": "Python Intern", "requirements": ["Kỹ năng lập trình Python"], "salary": null, "location": "Trần Thánh Tông, phường 15, Tân Bình, TP.HCM", "contact": null, "deadline": null, "work_type": "parttime", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "Web Application Development", "FastAPI/Flask"], "missing_skills": ["Kinh nghiệm cụ thể về IoT (nếu có)"], "recommendation": "Ứng viên rất phù hợp với vị trí này vì Python là ngôn ngữ chính trong CV. Ứng viên có nền tảng kỹ thuật mạnh về AI và hệ thống, hoàn toàn có thể đáp ứng tốt công việc thực tập tại Seprinder.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:37"}, {"id": 12, "post_hash": "7a698404062532c8debdd2e7435564b6", "company": "Finpros", "position": "Intern Python Developer, Intern Data Engineer, Intern AI Quantitative Researcher", "requirements": ["Sinh viên năm 3, 4 các ngành CNTT, Khoa học dữ liệu, AI, Toán ứng dụng hoặc chuyên ngành liên quan", "Có tinh thần học hỏi, chủ động và trách nhiệm trong công việc"], "salary": "Có phụ cấp lương và phụ cấp ăn ca", "location": "Hà Nội, TP. Hồ Chí Minh", "contact": "talent@finpros.vn, Ms. Tuyến - 0703 451 511", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "AI/Machine Learning", "Data Science related skills", "Đang là sinh viên năm 3-4"], "missing_skills": ["Kinh nghiệm cụ thể về Quantitative Trading (nếu ứng tuyển vị trí AI Quant Researcher)"], "recommendation": "Ứng viên rất phù hợp với các vị trí Intern Python Developer và AI Quantitative Researcher nhờ nền tảng kỹ thuật mạnh về AI và Python. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:22"}, {"id": 11, "post_hash": "79f0266ad6e3f34d9113f1a4a83b0dc6", "company": "AI Empire", "position": "AI Engineer Intern", "requirements": ["Biết Python", "Có nền tảng ML/DL/LLM/RAG/OCR", "Biết Git/GitHub", "Tinh thần học thật – làm thật"], "salary": "Phụ cấp theo năng lực", "location": null, "contact": "Zalo: 0919 204 867", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "Machine Learning/Deep Learning", "LLM & Agent Engineering", "Git/GitHub", "PyTorch/TensorFlow"], "missing_skills": ["OCR", "RAG (Retrieval-Augmented Generation)", "Qdrant"], "recommendation": "Ứng viên rất phù hợp với vị trí này. CV thể hiện nền tảng mạnh về AI/LLM và các dự án thực tế. Ứng viên nên nhấn mạnh thêm các kiến thức về RAG hoặc OCR nếu có trong quá trình phỏng vấn để tăng khả năng trúng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:13"}, {"id": 8, "post_hash": "e6c189d029249a5db7be82b3a0520f21", "company": "MH Solution", "position": "Data Engineer Intern", "requirements": ["Sinh viên năm 3, 4 ngành CNTT / Khoa học máy tính", "Kiến thức cơ bản về CSDL", "Biết SQL, Python", "Tiếp cận ít nhất 1 hệ CSDL: MySQL / SQL Server / Oracle / HBase"], "salary": null, "location": "Tầng 5, 73 Trần Thái Tông, Cầu Giấy, Hà Nội", "contact": "hr@mhsolution.vn", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 90, "matched_skills": ["Python", "SQL", "Sinh viên năm 3/4 (tốt nghiệp 2026)"], "missing_skills": ["Kinh nghiệm cụ thể với MySQL/SQL Server/Oracle/HBase (CV chưa liệt kê rõ các hệ quản trị CSDL này)"], "recommendation": "Ứng viên rất phù hợp với vị trí này. Kỹ năng Python và SQL của ứng viên là thế mạnh. Nên ứng tuyển và nhấn mạnh thêm các dự án liên quan đến xử lý dữ liệu hoặc CSDL trong quá trình phỏng vấn.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:00"}, {"id": 5, "post_hash": "8be00284d1285c1fe88c2922846bdda6", "company": "SOTATEK", "position": "AI Engineer / AI Solution Provider – Computer Vision", "requirements": ["Đam mê AI", "Khả năng biến yêu cầu khách hàng thành sản phẩm", "Kỹ năng về Computer Vision"], "salary": null, "location": "Golden Park Tower Số 2 Phạm Văn Bạch, Cầu Giấy, Hà Nội", "contact": "duy.hoang@sotatek.com", "deadline": null, "work_type": "fulltime", "experience_level": "Intern, Fresher, Junior, Mid, Senior", "match_score": 90, "matched_skills": ["Python", "Deep Learning", "Computer Vision", "OpenCV", "AI Model Development"], "missing_skills": ["Kinh nghiệm làm việc thực tế tại doanh nghiệp (ứng viên đang là sinh viên)"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật mạnh về AI, Deep Learning và dự án thực tế liên quan đến Computer Vision/WAF. Nên ứng tuyển ngay vào vị trí Intern hoặc Fresher.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:43"}, {"id": 50, "post_hash": "43239a5803305c8886532845221cea28", "company": null, "position": "Fresher/Junior/Middle Full-stack Dev", "requirements": ["Backend: PHP hoặc Python", "Frontend: ReactJS hoặc VueJS"], "salary": null, "location": "Tòa nhà Dolphin Plaza, số 6 Nguyễn Hoàng, Nam Từ Liêm, Hà Nội", "contact": null, "deadline": null, "work_type": "fulltime", "experience_level": "Fresher/Junior/Middle", "match_score": 85, "matched_skills": ["Python", "React"], "missing_skills": ["PHP", "VueJS"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ kỹ năng Python và React. Mặc dù thiếu PHP và VueJS, nhưng với nền tảng kỹ thuật mạnh về AI và Web Development, ứng viên hoàn toàn có khả năng đáp ứng công việc. Nên ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:56"}, {"id": 49, "post_hash": "566eb4aeab832bfe8362f9de746be3df", "company": "CÔNG TY CỔ PHẦN TECHLEAD", "position": "Fresher AI", "requirements": ["Phát triển ứng dụng AI", "Xây dựng AI Chatbot / AI Assistant sử dụng LLM (OpenAI, Claude, Gemini) và LangChain", "Thiết kế, xây dựng và tích hợp AI Agent", "Xây dựng RAG pipelines", "Làm việc với MCP để kết nối mô hình ngôn ngữ với dữ liệu và API nội bộ"], "salary": null, "location": null, "contact": null, "deadline": null, "work_type": null, "experience_level": "fresher", "match_score": 85, "matched_skills": ["AI Agent Engineering", "LLM", "Python", "Software Architecture", "API Design"], "missing_skills": ["LangChain", "MCP (Model Context Protocol)", "RAG pipelines"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng vững chắc về AI Agent và LLM. Mặc dù thiếu kinh nghiệm cụ thể với LangChain và MCP, nhưng với kỹ năng lập trình và tư duy hệ thống hiện có, ứng viên hoàn toàn có khả năng học hỏi nhanh. Rất khuyến khích ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:53"}, {"id": 47, "post_hash": "ffef776d29bb3d22f76d73ed2ce547e7", "company": "Loogix Technology", "position": "Backend Developer (Golang)", "requirements": ["Nền tảng Golang/Backend", "Tư duy logic và khả năng học công nghệ nhanh", "Kiến thức về Microservices, Database hoặc DevOps (Ưu tiên)"], "salary": "Up to 35M", "location": "Hà Nội", "contact": "Ms. Hồng Ngọc – 0983 161 461", "deadline": null, "work_type": "fulltime", "experience_level": "Fresher/Junior/Middle/Senior", "match_score": 85, "matched_skills": ["Golang", "Python", "Cybersecurity", "System Architecture", "Docker", "Linux"], "missing_skills": ["Kinh nghiệm làm việc thực tế với Microservices", "Kinh nghiệm chuyên sâu về Cloud Native"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật mạnh về Cybersecurity và kiến thức đa dạng (bao gồm Golang). Dự án AI Security WAF của ứng viên là điểm cộng lớn cho lĩnh vực hoạt động của công ty. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:45"}, {"id": 46, "post_hash": "01b43ec4cb0a798f51180bf9f6b20ba0", "company": "CC1", "position": "Data Engineer, Data Analyst, Chuyên viên AI, BA, Chuyên viên triển khai/vận hành ERP", "requirements": ["Tốt nghiệp đại học các ngành CNTT, Hệ thống thông tin quản lý, Kế toán/Tài chính", "SQL, Python, ETL cơ bản (cho Data Engineer)", "PowerBI/Tableau, SQL (cho Data Analyst)", "Chăm chỉ, chịu được áp lực tiến độ dự án"], "salary": "Thỏa thuận theo năng lực", "location": "Quận 1", "contact": "toan.tt@cc1investment.vn / 0931 249 901", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior", "match_score": 85, "matched_skills": ["Python", "SQL", "AI/Machine Learning", "Data processing"], "missing_skills": ["PowerBI/Tableau", "Kinh nghiệm triển khai ERP", "Quy trình nghiệp vụ kế toán/tài chính"], "recommendation": "Ứng viên rất phù hợp cho vị trí Data Engineer hoặc Chuyên viên AI. CV thể hiện kỹ năng kỹ thuật mạnh mẽ và tư duy hệ thống tốt. Nên ứng tuyển và nhấn mạnh vào các dự án AI/Data đã thực hiện.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:41"}, {"id": 45, "post_hash": "114afd3e3cf0717250220b5eb8a0bed3", "company": "SOTATEK AI TEAM", "position": "AI Engineer / AI Solution Provider – Computer Vision", "requirements": ["Kỹ năng về Python", "Kỹ năng về Data Science & Engineer", "Kỹ năng về AI", "Kỹ năng về Computer Vision"], "salary": null, "location": "Golden Park Tower Số 2 Phạm Văn Bạch, Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": null, "experience_level": "Intern, Fresher, Junior, Mid, Senior", "match_score": 85, "matched_skills": ["Python", "AI/Deep Learning", "OpenCV", "Model Fine-tuning"], "missing_skills": ["Kinh nghiệm chuyên sâu về Data Engineering", "Kinh nghiệm thực tế tại môi trường doanh nghiệp (ứng viên đang là sinh viên)"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng AI/Computer Vision mạnh mẽ và dự án thực tế liên quan đến bảo mật AI. Nên ứng tuyển ngay vì công ty tuyển dụng từ cấp Intern đến Senior.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:37"}, {"id": 38, "post_hash": "55032fa496797840f3c590eb1dab0050", "company": null, "position": "Intern/Fresher AI Engineer", "requirements": ["Tốt nghiệp Đại học ngành CNTT hoặc liên quan", "6 tháng – 1 năm kinh nghiệm phát triển/triển khai mô hình AI, Computer Vision", "Thành thạo Python, PyTorch, TensorFlow, OpenCV, ONNX", "Hiểu biết về kiến trúc AI"], "salary": null, "location": "Quận 10, TP.HCM", "contact": null, "deadline": null, "work_type": "intern", "experience_level": "intern/fresher", "match_score": 85, "matched_skills": ["Python", "PyTorch", "TensorFlow", "OpenCV", "AI/Deep Learning"], "missing_skills": ["ONNX", "Kinh nghiệm làm việc thực tế (chưa rõ thời gian làm việc chính thức ngoài dự án cá nhân)"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật vững chắc và các dự án AI thực tế. Nên ứng tuyển và nhấn mạnh vào dự án AI Security WAF để chứng minh khả năng triển khai mô hình thực tế.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:07"}, {"id": 36, "post_hash": "fa69507647f258b5870aa94b1a360341", "company": "VinFast", "position": "System Engineer", "requirements": ["Background về Automotive / Control / Automation / Robotics / IT / Computer Science", "Biết 1 trong các ngôn ngữ: Python / MATLAB / C++", "Tư duy logic, giải quyết vấn đề tốt", "Giao tiếp Tiếng Anh tốt", "Chủ động học hỏi"], "salary": null, "location": "Toà nhà Technopark, Gia Lâm, Hà Nội", "contact": "v.ngaht42@vinfast.vn", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior", "match_score": 85, "matched_skills": ["Python", "C/C++", "Computer Science background", "Problem solving", "System architecture"], "missing_skills": ["Kinh nghiệm cụ thể về Automotive/ADAS", "Kinh nghiệm sử dụng công cụ mô phỏng như CARLA/SIL/NCAP", "MATLAB"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật vững chắc (Python, C++, CS). Dù thiếu kinh nghiệm chuyên sâu về Automotive, nhưng với tư duy về AI/System Architecture, ứng viên hoàn toàn có khả năng đáp ứng yêu cầu công việc. Nên ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:56"}, {"id": 35, "post_hash": "f3573f067e5b1eb04ea9025ac59d604c", "company": "BlueOC", "position": "Fresher Fullstack (ReactJS / NodeJS / Python), Fresher C++ Developer, Fresher .NET Developer, Fresher QA / Tester", "requirements": ["Sinh viên mới tốt nghiệp hoặc fresher IT", "Tiếng Anh giao tiếp tốt"], "salary": "Up to 15M Gross", "location": "Technopark – Gia Lâm, Hà Nội", "contact": null, "deadline": null, "work_type": "fulltime", "experience_level": "fresher", "match_score": 85, "matched_skills": ["Python", "React", "C++", "C#"], "missing_skills": ["Tiếng Anh giao tiếp (chưa được đề cập trong CV)", "NodeJS (CV tập trung vào FastAPI/Flask)"], "recommendation": "Ứng viên rất phù hợp với các vị trí Fresher Fullstack và C++ Developer. CV thể hiện nền tảng kỹ thuật mạnh mẽ và các dự án thực tế ấn tượng. Nên ứng tuyển và nhấn mạnh khả năng tiếng Anh trong thư ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:53"}, {"id": 30, "post_hash": "2ac1825d71f5ff287542913f173b510e", "company": null, "position": "Intern/Fresher AI Engineer", "requirements": ["Tốt nghiệp ĐH ngành CNTT hoặc liên quan", "6 tháng – 1 năm kinh nghiệm phát triển/triển khai mô hình AI, Computer Vision", "Thành thạo Python, PyTorch, TensorFlow, OpenCV, ONNX", "Hiểu biết về kiến trúc AI trên nền tảng Edge/Cloud và tối ưu GPU", "Kinh nghiệm với Docker, gRPC hoặc REST APIs", "Đọc hiểu tài liệu kỹ thuật tiếng Anh"], "salary": null, "location": "Quận 10, TP.HCM", "contact": "0975.836.942 (zaslo)", "deadline": null, "work_type": "intern", "experience_level": "intern/fresher", "match_score": 85, "matched_skills": ["Python", "PyTorch", "TensorFlow", "OpenCV", "Docker", "REST APIs", "AI/Deep Learning"], "missing_skills": ["ONNX", "Kinh nghiệm với Redis, Kafka, NATS, MQTT hoặc Prometheus/Grafana", "Kinh nghiệm triển khai AI trên Edge/Cloud"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng AI vững chắc và dự án thực tế về Computer Vision (WAF). Nên ứng tuyển ngay và nhấn mạnh vào dự án AI Security để làm nổi bật khả năng triển khai thực tế.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:31"}, {"id": 27, "post_hash": "7ed837fc6ebc5a5953ba1051e429edd9", "company": "Sotatek", "position": "Rust Developer", "requirements": ["Đọc hiểu tốt tài liệu kỹ thuật bằng tiếng Anh", "Thành thạo ít nhất một trong các ngôn ngữ: Java / Python / NodeJS / Rust", "Nắm vững kiến thức cơ bản về backend và framework", "Tư duy logic tốt, kỹ năng giải quyết vấn đề", "Chủ động học hỏi"], "salary": null, "location": "Hà Nội", "contact": "IB trực tiếp người đăng bài", "deadline": null, "work_type": null, "experience_level": "Fresher/Junior", "match_score": 85, "matched_skills": ["Python", "Backend development", "Tư duy logic", "Khả năng học hỏi công nghệ mới"], "missing_skills": ["Rust (chưa có trong danh sách kỹ năng)", "Kinh nghiệm làm việc thực tế với Java hoặc NodeJS"], "recommendation": "Ứng viên rất phù hợp để ứng tuyển. Dù chưa có Rust trong CV, nhưng với nền tảng Python mạnh mẽ và tư duy về hệ thống/AI, ứng viên hoàn toàn có thể đáp ứng yêu cầu học hỏi công nghệ mới của công ty.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:20"}, {"id": 26, "post_hash": "61cea132111e572b99795c7c03befa4f", "company": "FINPROS", "position": "Data Engineer Intern", "requirements": ["Yêu thích Data", "Kỹ năng Python", "Quan tâm đến lĩnh vực Fintech, Trading & Big Data"], "salary": "Phụ cấp thực tập + ăn trưa", "location": null, "contact": null, "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 85, "matched_skills": ["Python", "SQL", "Stream Processing", "System Architecture"], "missing_skills": ["Kinh nghiệm cụ thể về Big Data frameworks (như Spark, Hadoop)", "Kinh nghiệm làm việc với Data Pipeline/ETL chuyên sâu"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng Python vững chắc và tư duy hệ thống tốt. Mặc dù CV tập trung nhiều vào AI/Security, nhưng kỹ năng lập trình và xử lý dữ liệu của ứng viên hoàn toàn đáp ứng được yêu cầu của một thực tập sinh Data Engineer. Nên ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:10:14"}, {"id": 22, "post_hash": "346711a7d74c3d264a3b755c35a3f622", "company": "Varmeta", "position": "AI Engineer (Intern/Senior)", "requirements": ["Python (đối với Intern)", "4 năm kinh nghiệm (đối với Senior)", "Tiếng Anh giao tiếp tốt", "Tư duy builder"], "salary": "Thỏa thuận theo năng lực", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox người đăng (Thành Công Võ)", "deadline": null, "work_type": "Hybrid (có 24 ngày WFH/năm)", "experience_level": "Intern/Senior", "match_score": 85, "matched_skills": ["Python", "LLM & Agent Engineering", "Multi-Agent Systems", "AI Workflow Optimization"], "missing_skills": ["4 năm kinh nghiệm thực tế (ứng viên là sinh viên năm cuối)", "Chứng chỉ hoặc bằng chứng về khả năng tiếng Anh giao tiếp"], "recommendation": "Ứng viên rất phù hợp với vị trí Intern vì có dự án thực tế về AI Agent và Python. Nên ứng tuyển ngay vào vị trí Intern và nhấn mạnh vào các dự án AI/Agentic Workflows đã thực hiện để gây ấn tượng với nhà tuyển dụng.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:59"}, {"id": 18, "post_hash": "6d824ac2ecddaceb7db2e194084d4e24", "company": "FINPROS", "position": "Data Engineer Intern", "requirements": ["Yêu thích Data", "Kỹ năng Python", "Quan tâm đến Fintech, Trading & Big Data"], "salary": "Phụ cấp thực tập + ăn trưa", "location": "Ngoại Giao Đoàn, Hà Nội", "contact": "talent@finpros.vn, 070 345 1511", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 85, "matched_skills": ["Python", "SQL", "Data processing", "System Architecture", "FastAPI/Flask (Backend/Data pipeline support)"], "missing_skills": ["Kinh nghiệm cụ thể về Big Data frameworks (Spark, Hadoop, Kafka)", "Kinh nghiệm làm việc với Data Warehouse/ETL pipelines chuyên sâu"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng Python mạnh mẽ và tư duy hệ thống tốt. Mặc dù thiếu kinh nghiệm chuyên sâu về Big Data, nhưng với kỹ năng AI/Agentic Workflow và khả năng học hỏi nhanh, ứng viên hoàn toàn có thể ứng tuyển và đóng góp tốt cho các dự án Fintech tại Finpros.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:45"}, {"id": 13, "post_hash": "7e6caa6c243ef132dcacbda37d77cfe9", "company": "Molex Việt Nam", "position": "Intern Operations Excellence", "requirements": ["Sinh viên ngành IT/Computer Science", "Tiếng Anh tốt", "Kiến thức cơ bản về full-stack development và database", "Kỹ năng lập trình Java / Python / .NET", "Hiểu biết về HTML, CSS, JavaScript"], "salary": "7.000.000 VNĐ/tháng", "location": null, "contact": "tony.le1@molex.com, mary.nguyenthicam@molex.com, 0975 946 195", "deadline": null, "work_type": "intern", "experience_level": "intern", "match_score": 85, "matched_skills": ["Python", "JavaScript", "Full-stack development", "SQL", "React", "FastAPI/Flask"], "missing_skills": ["Angular", ".NET Core", "Java"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng kỹ thuật mạnh về Python và Web Development. Mặc dù thiếu kinh nghiệm với .NET và Angular, nhưng với tư duy lập trình tốt, ứng viên hoàn toàn có thể học hỏi nhanh. Rất khuyến khích ứng tuyển.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:09:26"}, {"id": 7, "post_hash": "76db00c403ca43d1aca83d990a30a6ec", "company": "SOTATEK AI TEAM", "position": "AI Engineer / AI Solution Provider – Computer Vision", "requirements": ["Kỹ năng về AI/Computer Vision", "Phù hợp với các level từ Intern đến Senior"], "salary": null, "location": "Golden Park Tower Số 2 Phạm Văn Bạch, Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": null, "experience_level": "Intern, Fresher, Junior, Mid, Senior", "match_score": 85, "matched_skills": ["Python", "Deep Learning", "Computer Vision", "PyTorch", "TensorFlow/Keras", "OpenCV"], "missing_skills": ["Kinh nghiệm làm việc thực tế tại doanh nghiệp (ứng viên đang là sinh viên)", "Chưa đề cập cụ thể các dự án Computer Vision chuyên sâu ngoài dự án WAF"], "recommendation": "Ứng viên rất phù hợp để ứng tuyển vị trí Intern hoặc Fresher AI Engineer. CV thể hiện nền tảng kỹ thuật mạnh về AI và Computer Vision (OpenCV, Deep Learning). Nên nhấn mạnh thêm các dự án liên quan đến Computer Vision trong CV khi gửi ứng tuyển.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:53"}, {"id": 6, "post_hash": "5c1edb2697e93068d3892542b09d5f9f", "company": "KIAISOFT", "position": "Intern Web Dev Python", "requirements": ["Sinh viên IT năm 3, 4 hoặc sắp tốt nghiệp", "Định hướng Backend/Python", "Ưu tiên sinh viên các trường HUST, UET, PTIT"], "salary": null, "location": "Cầu Giấy, Hà Nội", "contact": null, "deadline": null, "work_type": "Fulltime hoặc Parttime", "experience_level": "intern", "match_score": 85, "matched_skills": ["Python", "Web Development", "FastAPI", "Flask", "SQL"], "missing_skills": ["Sinh viên trường HUST/UET/PTIT (Ứng viên thuộc ĐH Khoa học Tự nhiên - VNU)"], "recommendation": "Ứng viên rất phù hợp về mặt kỹ thuật (Python, Web Backend). Dù không thuộc nhóm trường ưu tiên, nhưng với nền tảng AI và Web mạnh mẽ, ứng viên hoàn toàn nên ứng tuyển vì năng lực vượt trội so với yêu cầu thực tập sinh thông thường.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:49"}, {"id": 2, "post_hash": "e4b292ddc1d18c8a085e25302e58d4b0", "company": "KIAISOFT", "position": "Intern Web Dev Python", "requirements": ["Sinh viên năm 3, 4 hoặc sắp tốt nghiệp", "GPA >= 3.2", "Nền tảng Web cơ bản", "Từng làm Django trong dự án", "Chủ động học hỏi, teamwork tốt", "Biết Git hoặc đã làm project Python"], "salary": "Trợ cấp + hỗ trợ dự án", "location": "Cầu Giấy, Hà Nội", "contact": "Inbox Facebook", "deadline": null, "work_type": "Fulltime hoặc Parttime", "experience_level": "intern", "match_score": 85, "matched_skills": ["Python", "Web Development", "Git", "FastAPI/Flask (nền tảng Web)", "Sinh viên năm cuối"], "missing_skills": ["Django (ứng viên dùng FastAPI/Flask)", "Thông tin GPA trong CV"], "recommendation": "Ứng viên rất phù hợp với vị trí này nhờ nền tảng Python và Web mạnh mẽ. Dù thiếu kinh nghiệm cụ thể với Django, nhưng với kỹ năng về FastAPI/Flask và các dự án AI/Web phức tạp, ứng viên hoàn toàn có thể đáp ứng tốt yêu cầu công việc. Nên ứng tuyển ngay.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:32"}, {"id": 43, "post_hash": "4d729b1e1f07eb798cc32e682403ea57", "company": null, "position": "Fresher/Junior/Middle Full-stack Dev", "requirements": ["Tối thiểu 6 tháng kinh nghiệm Full-stack với PHP hoặc Python và ReactJS hoặc VueJS", "Thành thạo PHP, nắm vững framework như Laravel", "Kinh nghiệm về MVC, TypeScript, Redux, React Router", "Kiến thức về RESTful APIs, WebSocket và SQL (MySQL, PostgreSQL)", "Sử dụng tốt Git và hiểu về CI/CD"], "salary": null, "location": "Tòa nhà Dolphin Plaza, số 6 Nguyễn Hoàng, Nam Từ Liêm, Hà Nội", "contact": "Ib nhận JD", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior/middle", "match_score": 75, "matched_skills": ["Python", "React", "TypeScript", "REST API Design", "SQL", "Git"], "missing_skills": ["PHP", "Laravel", "Redux", "WebSocket", "CI/CD (chưa đề cập rõ)", "Kinh nghiệm làm việc thực tế 6 tháng"], "recommendation": "Ứng viên rất tiềm năng với nền tảng kỹ thuật mạnh về AI và Web. Tuy nhiên, CV thiếu kinh nghiệm về PHP/Laravel và Redux. Ứng viên nên ứng tuyển nếu sẵn sàng học thêm PHP/Laravel vì kỹ năng Python và React đã đáp ứng tốt yêu cầu cốt lõi.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:26"}, {"id": 34, "post_hash": "666be737f32ef2e2aed8271992bbb970", "company": "TMA Tech Group", "position": "AI Engineer", "requirements": ["1–3 năm kinh nghiệm AI/ML", "Nắm vững ML, DL, NLP, CV", "Thành thạo Python và các framework AI", "Tư duy giải quyết bài toán & làm việc team tốt"], "salary": null, "location": "TP.HCM", "contact": "IB người đăng (Thư Lê)", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/middle", "match_score": 75, "matched_skills": ["Python", "Machine Learning", "Deep Learning", "Computer Vision", "PyTorch/TensorFlow", "Bi-LSTM"], "missing_skills": ["1-3 năm kinh nghiệm làm việc thực tế (ứng viên là sinh viên năm cuối)", "NLP (chưa được nhấn mạnh rõ trong CV)"], "recommendation": "Ứng viên rất phù hợp về mặt kỹ thuật với các dự án AI thực tế ấn tượng. Mặc dù chưa đủ số năm kinh nghiệm theo yêu cầu (1-3 năm), nhưng với nền tảng kỹ thuật mạnh, ứng viên nên ứng tuyển và nhấn mạnh vào các dự án AI đã thực hiện để bù đắp kinh nghiệm làm việc.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:49"}, {"id": 31, "post_hash": "31bc2cc59237dff439332969ed762816", "company": "Digime", "position": "Data Analyst, Data Engineer", "requirements": ["Data Analyst: Fresh/Dưới 1 năm kinh nghiệm, thạo Excel, biết cơ bản SQL/Python", "Data Engineer: 1+ năm kinh nghiệm, thành thạo SQL, Python, PostgreSQL"], "salary": null, "location": "79 Tạ Hiện, Thạnh Mỹ Lợi (Cát Lái), TP. Thủ Đức, HCM", "contact": "Inbox trực tiếp", "deadline": null, "work_type": "onsite", "experience_level": "fresher/junior", "match_score": 75, "matched_skills": ["Python", "SQL"], "missing_skills": ["Excel", "Power BI", "PostgreSQL", "Kinh nghiệm làm Data Pipeline/Data Warehouse"], "recommendation": "Ứng viên hoàn toàn phù hợp với vị trí Data Analyst (Fresher). Tuy nhiên, CV hiện tại tập trung quá nhiều vào AI/Deep Learning và Cybersecurity, ứng viên nên điều chỉnh CV để làm nổi bật các kỹ năng xử lý dữ liệu và dashboarding nếu muốn ứng tuyển vào vị trí này.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:10:35"}, {"id": 41, "post_hash": "45cf2b822d7f7e7b883a005c5a93b428", "company": null, "position": "SQL Dev", "requirements": ["Kỹ năng SQL", "English giao tiếp khá"], "salary": "40M+bonus", "location": "Hanoi", "contact": "IB (Inbox) người đăng bài", "deadline": null, "work_type": null, "experience_level": "fresher/junior/mid", "match_score": 65, "matched_skills": ["SQL"], "missing_skills": ["English giao tiếp (chưa được đề cập trong CV)", "Kinh nghiệm chuyên sâu về SQL Dev (CV tập trung nhiều vào AI/ML và Web)"], "recommendation": "Ứng viên có kỹ năng SQL cơ bản nhưng hồ sơ hiện tại tập trung quá mạnh vào AI/ML và Agentic Workflows. Ứng viên nên ứng tuyển nếu có khả năng giao tiếp tiếng Anh tốt và sẵn sàng làm việc chuyên sâu về SQL thay vì AI.", "classification_confidence": 0.95, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:18"}, {"id": 37, "post_hash": "f1f7c4a043d7bf73b39f665ca53411ce", "company": "NAB Vietnam", "position": "Intern/Fresher (Javascript/Java/Testing)", "requirements": ["Là nữ", "Kiến thức cơ bản về lập trình", "Quan tâm đến Java, Javascript và Testing"], "salary": "11.500.000 VND/tháng (cho giai đoạn StarCamp)", "location": "HCM", "contact": "https://bit.ly/WeCampBatch12_Registration", "deadline": "10 July 2026", "work_type": "part-time", "experience_level": "intern/fresher", "match_score": 40, "matched_skills": ["Javascript", "Python (nền tảng lập trình)"], "missing_skills": ["Giới tính nữ (yêu cầu bắt buộc của chương trình)", "Java", "Testing chuyên sâu"], "recommendation": "Ứng viên không nên ứng tuyển vì chương trình WeCamp Batch 12 dành riêng cho các bạn NỮ, trong khi ứng viên là nam. Về mặt kỹ thuật, ứng viên có trình độ vượt xa yêu cầu của chương trình này.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+fresher", "post_url": "", "created_at": "2026-06-05 18:11:03"}, {"id": 3, "post_hash": "c3b465fc8659a6d95fd5d31c8ce7ba98", "company": "NAB Vietnam", "position": "Intern/Fresher (Javascript/Java/Testing)", "requirements": ["Là nữ", "Kiến thức cơ bản về lập trình", "Quan tâm đến Java, Javascript và Testing"], "salary": "11.500.000 VND/tháng (cho giai đoạn StarCamp)", "location": "HCM", "contact": "https://bit.ly/WeCampBatch12_Registration", "deadline": "10 July 2026", "work_type": "part-time", "experience_level": "intern/fresher", "match_score": 40, "matched_skills": ["Javascript", "Python", "Kỹ năng lập trình nền tảng"], "missing_skills": ["Giới tính nữ (ứng viên là nam)", "Java (chưa liệt kê trong kỹ năng chính)", "Testing chuyên sâu"], "recommendation": "Ứng viên không nên ứng tuyển vì chương trình này dành riêng cho các bạn NỮ. Mặc dù ứng viên có kỹ năng kỹ thuật rất tốt và vượt xa yêu cầu của chương trình, nhưng không đáp ứng tiêu chí giới tính bắt buộc của nhà tuyển dụng.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+python+intern", "post_url": "", "created_at": "2026-06-05 18:08:36"}, {"id": 1, "post_hash": "30351d37c336daa512817ef87d68aa32", "company": "BG Home", "position": "Nhân viên Thiết kế Nội thất", "requirements": ["Tốt nghiệp Cao đẳng/Đại học chuyên ngành Thiết kế Nội thất, Kiến trúc", "Sử dụng tốt AutoCAD, 3Ds Max/SketchUp, V-Ray/Photoshop", "Tư duy thẩm mỹ, hiểu vật liệu nội thất", "Kinh nghiệm từ 6 tháng – 2 năm"], "salary": "10 tr - 20 tr / tháng", "location": "41 Phố Thú Y, Hoài Đức, Hà Nội", "contact": "cptttrang@gmail.com / 0946408555", "deadline": null, "work_type": "fulltime", "experience_level": "fresher/junior", "match_score": 5, "matched_skills": [], "missing_skills": ["Thiết kế nội thất", "AutoCAD", "3Ds Max/SketchUp", "V-Ray/Photoshop", "Kiến thức vật liệu nội thất"], "recommendation": "Ứng viên không nên ứng tuyển. CV của ứng viên tập trung hoàn toàn vào lĩnh vực Công nghệ thông tin, AI và lập trình, hoàn toàn không có kỹ năng hoặc kinh nghiệm liên quan đến thiết kế nội thất theo yêu cầu của nhà tuyển dụng.", "classification_confidence": 1.0, "group_url": "https://www.facebook.com/search/posts/?q=tuy%E1%BB%83n+d%E1%BB%A5ng+ai+fresher", "post_url": "", "created_at": "2026-06-05 18:08:22"}];
+        const STATS_DATA = {"total_posts_scraped": 64, "posts_analyzed": 64, "job_posts_found": 50, "total_job_listings": 50, "average_match_score": 84.5};
+    </script>
+
+    <script>
+        // DOM Nodes
+        const themeBtn = document.getElementById('theme-btn');
+        const uploadBox = document.getElementById('upload-box');
+        const fileInput = document.getElementById('file-input');
+        const cvTextarea = document.getElementById('cv-textarea');
+        const searchInput = document.getElementById('search-input');
+        const minScoreRange = document.getElementById('min-score-range');
+        const scoreVal = document.getElementById('score-val');
+        const levelSelect = document.getElementById('level-select');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const jobsList = document.getElementById('jobs-list');
+        const jobDetails = document.getElementById('job-details');
+        const scrapeBtn = document.getElementById('scrape-btn');
+        const scrapeStatusContainer = document.getElementById('scrape-status-container');
+        const scrapeLogConsole = document.getElementById('scrape-log-console');
+
+        // State variables
+        let jobs = [...JOBS_DATA];
+        let activeJobId = null;
+        let userCvText = "";
+
+        // Standard IT Skills Dictionary for client-side semantic matching
+        const SKILLS_DICT = [
+            "python", "fastapi", "flask", "django", "pytorch", "tensorflow", "keras", "scikit-learn", 
+            "opencv", "react", "vue", "angular", "nodejs", "javascript", "typescript", "golang", "go",
+            "c++", "c#", ".net", "java", "sql", "mysql", "postgresql", "mongodb", "docker", "docker compose", 
+            "kubernetes", "git", "github", "linux", "deep learning", "machine learning", "artificial intelligence", 
+            "ai agent", "llm", "nlp", "computer vision", "rest api", "waf", "security", "devops", "cloud", "aws"
+        ];
+
+        // Init Page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load stats
+            document.getElementById('stat-scraped').textContent = STATS_DATA.total_posts_scraped || 0;
+            document.getElementById('stat-jobs').textContent = STATS_DATA.job_posts_found || 0;
+            document.getElementById('stat-match').textContent = (STATS_DATA.average_match_score || 0) + '%';
+
+            // Load saved configurations from LocalStorage
+            const savedApiKey = localStorage.getItem('fb_bot_gemini_key');
+            if (savedApiKey) apiKeyInput.value = savedApiKey;
+
+            const savedCv = localStorage.getItem('user_cv_text');
+            if (savedCv) {
+                cvTextarea.value = savedCv;
+                userCvText = savedCv;
+                recalculateAllScores(savedCv);
+            }
+
+            // Bind Event Listeners
+            themeBtn.addEventListener('click', toggleTheme);
+            
+            uploadBox.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileUpload);
+
+            // Drag and drop event listeners
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--accent)';
+                uploadBox.style.background = 'var(--bg-card-hover)';
+            });
+
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.style.borderColor = 'var(--border-hover)';
+                uploadBox.style.background = 'var(--bg-primary)';
+            });
+
+            uploadBox.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--border-hover)';
+                uploadBox.style.background = 'var(--bg-primary)';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            });
+            cvTextarea.addEventListener('input', (e) => {
+                const text = e.target.value;
+                userCvText = text;
+                localStorage.setItem('user_cv_text', text);
+                recalculateAllScores(text);
+                applyFilters();
+            });
+
+            searchInput.addEventListener('input', applyFilters);
+            minScoreRange.addEventListener('input', (e) => {
+                scoreVal.textContent = e.target.value + '%';
+                applyFilters();
+            });
+            levelSelect.addEventListener('change', applyFilters);
+            apiKeyInput.addEventListener('input', (e) => {
+                localStorage.setItem('fb_bot_gemini_key', e.target.value);
+            });
+
+            scrapeBtn.addEventListener('click', triggerScrape);
+
+            // Fetch live API data if running on backend
+            if (isHosted) {
+                fetchJobsFromApi();
+                fetchStatsFromApi();
+                checkScrapeStatus();
+            } else {
+                applyFilters();
+            }
+        });
+
+        // Check if hosted on web server
+        const isHosted = window.location.protocol.startsWith('http');
+
+        async function fetchJobsFromApi() {
+            if (!isHosted) return;
+            try {
+                const res = await fetch('/api/jobs');
+                if (res.ok) {
+                    const data = await res.json();
+                    jobs = data.map(job => {
+                        const newScore = calculateKeywordScore(job, userCvText);
+                        return {
+                            ...job,
+                            match_score: newScore,
+                            is_recalculated: userCvText.trim().length > 0
+                        };
+                    });
+                    jobs.sort((a, b) => b.match_score - a.match_score);
+                    applyFilters();
+                }
+            } catch (e) {
+                console.error("Lỗi lấy dữ liệu job từ API:", e);
+            }
+        }
+
+        async function fetchStatsFromApi() {
+            if (!isHosted) return;
+            try {
+                const res = await fetch('/api/stats');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('stat-scraped').textContent = data.total_posts_scraped || 0;
+                    document.getElementById('stat-jobs').textContent = data.job_posts_found || 0;
+                    document.getElementById('stat-match').textContent = (data.average_match_score || 0) + '%';
+                }
+            } catch (e) {
+                console.error("Lỗi lấy dữ liệu stats từ API:", e);
+            }
+        }
+
+        async function checkScrapeStatus() {
+            if (!isHosted) return;
+            try {
+                const res = await fetch('/api/scrape/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.in_progress) {
+                        scrapeBtn.disabled = true;
+                        scrapeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang quét tin...';
+                        scrapeStatusContainer.style.display = 'block';
+                        scrapeLogConsole.textContent = data.logs.join('\n');
+                        scrapeLogConsole.scrollTop = scrapeLogConsole.scrollHeight; // Auto scroll
+                        
+                        setTimeout(checkScrapeStatus, 2000);
+                    } else {
+                        if (scrapeBtn.disabled) {
+                            scrapeBtn.disabled = false;
+                            scrapeBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Quét tin Facebook mới';
+                            scrapeStatusContainer.style.display = 'none';
+                            alert("Tiến trình quét Facebook hoàn tất!");
+                            fetchJobsFromApi();
+                            fetchStatsFromApi();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Lỗi kiểm tra trạng thái quét:", e);
+            }
+        }
+
+        async function triggerScrape() {
+            if (!isHosted) {
+                alert("Nút này chỉ hoạt động khi bạn chạy Web server (app.py)!");
+                return;
+            }
+            try {
+                const res = await fetch('/api/scrape', { method: 'POST' });
+                if (res.ok) {
+                    checkScrapeStatus();
+                }
+            } catch (e) {
+                alert("Lỗi khi kết nối đến server: " + e.message);
+            }
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = themeBtn.querySelector('i');
+            if (document.body.classList.contains('light-mode')) {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // File upload utility
+        async function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            let text = "";
+            if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+                try {
+                    cvTextarea.value = "Đang đọc nội dung file PDF...";
+                    text = await extractTextFromPdf(file);
+                } catch (err) {
+                    console.error("Lỗi đọc PDF:", err);
+                    alert("Không thể đọc tệp PDF này. Hãy thử dán trực tiếp.");
+                    cvTextarea.value = userCvText;
+                    return;
+                }
+            } else {
+                text = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => resolve(evt.target.result);
+                    reader.readAsText(file, "UTF-8");
+                });
+            }
+
+            cvTextarea.value = text;
+            userCvText = text;
+            localStorage.setItem('user_cv_text', text);
+            recalculateAllScores(text);
+            applyFilters();
+        }
+
+        async function extractTextFromPdf(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(" ");
+                fullText += pageText + "\n";
+            }
+            return fullText;
+        }
+
+        // Fast keyword-based client-side score matching
+        function calculateKeywordScore(job, cvText) {
+            if (!cvText) return job.match_score; // fallback to DB score if CV is empty
+
+            const cvLower = cvText.toLowerCase();
+            const reqs = typeof job.requirements === 'string' ? JSON.parse(job.requirements) : (job.requirements || []);
+            
+            if (reqs.length === 0) return job.match_score;
+
+            // Find tech skills mentioned in requirements
+            const reqText = reqs.join(" ").toLowerCase();
+            const jobSkills = SKILLS_DICT.filter(skill => reqText.includes(skill));
+
+            if (jobSkills.length === 0) return job.match_score;
+
+            // Check how many of those skills are matched in CV
+            const matchedSkills = jobSkills.filter(skill => cvLower.includes(skill));
+            
+            // Calculate percentage matching score
+            const ratio = matchedSkills.length / jobSkills.length;
+            const computedScore = Math.round(ratio * 100);
+
+            // Blend 70% computed score + 30% original score to keep context of experience level, etc.
+            return Math.min(100, Math.round(computedScore * 0.7 + job.match_score * 0.3));
+        }
+
+        // Recalculate scores for all jobs
+        function recalculateAllScores(cvText) {
+            jobs = JOBS_DATA.map(job => {
+                const newScore = calculateKeywordScore(job, cvText);
+                return {
+                    ...job,
+                    match_score: newScore,
+                    is_recalculated: cvText.trim().length > 0
+                };
+            });
+            // Sort jobs by score descending
+            jobs.sort((a, b) => b.match_score - a.match_score);
+        }
+
+        // Filter and Render logic
+        function applyFilters() {
+            const search = searchInput.value.toLowerCase().trim();
+            const minScore = parseInt(minScoreRange.value, 10);
+            const selectedLevel = levelSelect.value;
+
+            const filtered = jobs.filter(job => {
+                const company = (job.company || '').toLowerCase();
+                const position = (job.position || '').toLowerCase();
+                const matched = (job.matched_skills || '').toLowerCase();
+                const skillsList = Array.isArray(job.matched_skills) ? job.matched_skills.join(" ") : matched;
+                
+                const searchMatch = !search || 
+                                    company.includes(search) || 
+                                    position.includes(search) || 
+                                    skillsList.toLowerCase().includes(search);
+
+                const scoreMatch = job.match_score >= minScore;
+
+                const level = (job.experience_level || '').toLowerCase();
+                const levelMatch = !selectedLevel || level.includes(selectedLevel);
+
+                return searchMatch && scoreMatch && levelMatch;
+            });
+
+            document.getElementById('jobs-count').textContent = filtered.length + ' tin';
+            renderJobsList(filtered);
+            
+            // If active job is still in the filtered list, update details, otherwise clear details
+            if (activeJobId) {
+                const activeJob = filtered.find(j => j.id === activeJobId);
+                if (activeJob) {
+                    showJobDetails(activeJob);
+                } else {
+                    clearDetails();
+                }
+            }
+        }
+
+        function clearDetails() {
+            jobDetails.innerHTML = `
+                <div class="empty-details">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <h3>Vui lòng chọn một công việc bên danh sách để xem chi tiết</h3>
+                    <p>Bộ đối khớp CV sẽ tự động tính điểm dựa trên hồ sơ của bạn</p>
+                </div>`;
+            activeJobId = null;
+        }
+
+        function renderJobsList(jobsToRender) {
+            jobsList.innerHTML = '';
+            
+            if (jobsToRender.length === 0) {
+                jobsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 1.8rem; margin-bottom: 8px;"></i>
+                        <p>Không tìm thấy tin phù hợp</p>
+                    </div>`;
+                return;
+            }
+
+            jobsToRender.forEach(job => {
+                const card = document.createElement('div');
+                card.className = `job-card ${activeJobId === job.id ? 'active' : ''}`;
+                card.dataset.id = job.id;
+
+                const scoreClass = job.match_score >= 70 ? 'high' : (job.match_score >= 40 ? 'mid' : 'low');
+
+                card.innerHTML = `
+                    <div class="job-card-header">
+                        <h4 class="job-card-title">${job.position || 'Không rõ vị trí'}</h4>
+                    </div>
+                    <div class="job-card-company">
+                        <i class="fa-solid fa-building"></i> ${job.company || 'N/A'}
+                    </div>
+                    <div class="job-card-meta">
+                        <span><i class="fa-solid fa-location-dot"></i> ${job.location || 'N/A'}</span>
+                        <span><i class="fa-solid fa-money-bill-wave"></i> ${job.salary || 'N/A'}</span>
+                    </div>
+                    <div class="badge-row">
+                        <span class="score-badge ${scoreClass}">
+                            <i class="fa-solid fa-circle-check"></i> ${job.match_score}%
+                        </span>
+                        ${job.is_recalculated ? '<span class="new-match-indicator">Đã chấm điểm CV</span>' : ''}
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    const prevActive = jobsList.querySelector('.job-card.active');
+                    if (prevActive) prevActive.classList.remove('active');
+                    card.classList.add('active');
+                    activeJobId = job.id;
+                    showJobDetails(job);
+                });
+
+                jobsList.appendChild(card);
+            });
+        }
+
+        // Display Detailed Job View
+        function showJobDetails(job) {
+            const reqs = typeof job.requirements === 'string' ? JSON.parse(job.requirements) : (job.requirements || []);
+            
+            // Extract dynamic match list based on loaded CV
+            let matched = [];
+            let missing = [];
+
+            if (userCvText.trim().length > 0) {
+                const cvLower = userCvText.toLowerCase();
+                const reqText = reqs.join(" ").toLowerCase();
+                const jobSkills = SKILLS_DICT.filter(skill => reqText.includes(skill));
+
+                matched = jobSkills.filter(skill => cvLower.includes(skill));
+                missing = jobSkills.filter(skill => !cvLower.includes(skill));
+            } else {
+                matched = typeof job.matched_skills === 'string' ? JSON.parse(job.matched_skills) : (job.matched_skills || []);
+                missing = typeof job.missing_skills === 'string' ? JSON.parse(job.missing_skills) : (job.missing_skills || []);
+            }
+
+            const reqHtml = reqs.map(r => `<li>${r}</li>`).join('') || '<li>Không rõ yêu cầu cụ thể</li>';
+            const matchedHtml = matched.map(s => `<span class="skill-tag matched">${s}</span>`).join('') || '<span style="color:var(--text-secondary); font-size:0.85rem;">Không khớp kỹ năng nào</span>';
+            const missingHtml = missing.map(s => `<span class="skill-tag missing">${s}</span>`).join('') || '<span style="color:var(--text-secondary); font-size:0.85rem;">Không có</span>';
+            
+            const scoreClass = job.match_score >= 70 ? 'high' : (job.match_score >= 40 ? 'mid' : 'low');
+
+            const applyButton = job.post_url ? `
+                <a href="${job.post_url}" target="_blank" class="btn btn-primary" style="margin-top: 15px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem bài viết tuyển dụng trên Facebook
+                </a>` : '';
+
+            // Render AI Recalculate button if API key is present
+            const hasApiKey = apiKeyInput.value.trim().length > 0;
+            const aiAnalyzeButton = hasApiKey ? `
+                <button class="btn" onclick="triggerAiReanalysis(${job.id})" style="background:var(--bg-primary); border-color:var(--accent);">
+                    <i class="fa-solid fa-microchip text-accent"></i> Hỏi Gemini AI chấm điểm lại
+                </button>` : '';
+
+            jobDetails.innerHTML = `
+                <div class="details-title-section">
+                    <div>
+                        <h2>${job.position || 'Không rõ vị trí'}</h2>
+                        <div class="job-card-company" style="font-size: 1.05rem;">
+                            <i class="fa-solid fa-building"></i> ${job.company || 'Không rõ tên công ty'}
+                        </div>
+                    </div>
+                    <span class="score-badge ${scoreClass}" style="font-size: 0.95rem; padding: 8px 16px;">
+                        Độ phù hợp: ${job.match_score}%
+                    </span>
+                </div>
+
+                <div class="details-meta-grid">
+                    <div class="details-meta-item">
+                        <div class="details-meta-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        <div class="details-meta-text">
+                            <h4>Mức Lương</h4>
+                            <p>${job.salary || 'Thỏa thuận'}</p>
+                        </div>
+                    </div>
+                    <div class="details-meta-item">
+                        <div class="details-meta-icon"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="details-meta-text">
+                            <h4>Địa Điểm</h4>
+                            <p>${job.location || 'Hà Nội/TP.HCM'}</p>
+                        </div>
+                    </div>
+                    <div class="details-meta-item">
+                        <div class="details-meta-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="details-meta-text">
+                            <h4>Cấp bậc</h4>
+                            <p style="text-transform: capitalize;">${job.experience_level || 'Intern/Fresher'}</p>
+                        </div>
+                    </div>
+                    <div class="details-meta-item">
+                        <div class="details-meta-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="details-meta-text">
+                            <h4>Hình thức</h4>
+                            <p style="text-transform: uppercase;">${job.work_type || 'Full-time'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-body">
+                    <div>
+                        <h3 class="details-section-title"><i class="fa-solid fa-list-check"></i> Yêu cầu chi tiết</h3>
+                        <ul style="padding-left: 20px; line-height: 1.6; color: var(--text-secondary);">
+                            ${reqHtml}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="details-section-title"><i class="fa-solid fa-circle-check text-success"></i> Kỹ năng phù hợp</h3>
+                        <div class="skills-container">
+                            ${matchedHtml}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="details-section-title"><i class="fa-solid fa-triangle-exclamation text-danger"></i> Kỹ năng chưa đáp ứng</h3>
+                        <div class="skills-container">
+                            ${missingHtml}
+                        </div>
+                    </div>
+
+                    <div id="ai-rec-section">
+                        <h3 class="details-section-title"><i class="fa-solid fa-lightbulb text-warning"></i> Đánh giá từ AI</h3>
+                        <div class="ai-box">
+                            ${job.recommendation || 'Chưa có nhận xét chi tiết.'}
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 15px;">
+                        ${applyButton}
+                        ${aiAnalyzeButton}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Trigger real-time client-side Gemini AI re-analysis using the key provided by the user
+        async function triggerAiReanalysis(jobId) {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                alert("Vui lòng nhập Gemini API Key ở thanh bên trái!");
+                return;
+            }
+
+            const job = jobs.find(j => j.id === jobId);
+            if (!job) return;
+
+            const recBox = document.getElementById('ai-rec-section');
+            recBox.innerHTML = `
+                <h3 class="details-section-title"><i class="fa-solid fa-spinner fa-spin text-accent"></i> Đang phân tích bằng Gemini AI...</h3>
+                <div class="ai-box" style="opacity: 0.6;">
+                    Đang gửi thông tin tuyển dụng & CV mới lên Gemini API để chấm điểm lại chi tiết...
+                </div>
+            `;
+
+            const prompt = `So sánh CV ứng viên với tin tuyển dụng bên dưới.
+Trả lời DUY NHẤT bằng JSON theo cấu trúc:
+{
+  "match_score": 0-100,
+  "matched_skills": ["kỹ năng phù hợp 1", "kỹ năng 2"],
+  "missing_skills": ["kỹ năng thiếu 1", "kỹ năng 2"],
+  "recommendation": "nhận xét ngắn gọn, khuyên ứng viên có nên ứng tuyển hay không và lý do"
+}
+
+CV ứng viên:
+---
+${userCvText}
+---
+
+Thông tin tuyển dụng:
+Công ty: ${job.company || "Không rõ"}
+Vị trí: ${job.position || "Không rõ"}
+Yêu cầu công việc: ${Array.isArray(job.requirements) ? job.requirements.join(", ") : job.requirements}
+`;
+
+            try {
+                // Call Gemini 2.5 Flash direct via fetch
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            temperature: 0.2
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Gemini API Error: Status ${response.status}`);
+                }
+
+                const data = await response.json();
+                const resText = data.candidates[0].content.parts[0].text;
+                const parsed = JSON.parse(resText);
+
+                // Update job object in memory
+                job.match_score = parsed.match_score;
+                job.matched_skills = parsed.matched_skills;
+                job.missing_skills = parsed.missing_skills;
+                job.recommendation = parsed.recommendation;
+
+                // Save back to local jobs state
+                const jobIdx = jobs.findIndex(j => j.id === jobId);
+                if (jobIdx !== -1) {
+                    jobs[jobIdx] = { ...job, is_recalculated: true };
+                }
+
+                // Re-render UI details and list
+                applyFilters();
+                showJobDetails(job);
+                alert("Đã phân tích đối khớp AI thành công!");
+
+            } catch (e) {
+                console.error("Lỗi phân tích AI:", e);
+                alert("Lỗi phân tích AI: " + e.message);
+                showJobDetails(job); // restore layout
+            }
+        }
+    </script>
+</body>
+</html>
