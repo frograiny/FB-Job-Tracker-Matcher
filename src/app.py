@@ -31,8 +31,8 @@ def run_scraper_task():
     scrape_in_progress = True
     scrape_log = ["--- Bắt đầu tiến trình quét tin Facebook ---"]
     try:
-        # Run playwright script in the local virtualenv
-        cmd = [".venv/bin/python", "src/fb_job_bot.py"]
+        # Use sys.executable to work both locally (venv) and in Docker
+        cmd = [sys.executable, "src/fb_job_bot.py"]
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
