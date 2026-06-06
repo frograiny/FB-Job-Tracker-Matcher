@@ -13,6 +13,7 @@ import logging
 import random
 import re
 import time
+from datetime import datetime, timedelta
 from typing import Optional
 
 from playwright.async_api import async_playwright, Page, BrowserContext
@@ -26,6 +27,7 @@ from fb_config import (
     ACTION_DELAY_MAX,
     MAX_SCROLLS_PER_GROUP,
     POSTS_PER_GROUP_LIMIT,
+    MAX_POST_AGE_DAYS,
     VIEWPORT_WIDTH,
     VIEWPORT_HEIGHT,
     USER_AGENT,
@@ -99,6 +101,98 @@ def has_keywords(text: str) -> bool:
                 break
                 
     return has_action and has_skill
+
+
+def parse_facebook_date(date_str: str) -> Optional[datetime]:
+    """Parse chuỗi ngày tháng của Facebook thành đối tượng datetime."""
+    if not date_str:
+        return None
+    
+    now = datetime.now()
+    date_str = date_str.lower().strip()
+    
+    # 1. Các định dạng tương đối ngắn/đơn giản
+    if "vừa xong" in date_str or "just now" in date_str or "vừa mới" in date_str:
+        return now
+        
+    # X phút / X mins
+    match = re.search(r"(\d+)\s*(phút|min)", date_str)
+    if match:
+        return now - timedelta(minutes=int(match.group(1)))
+        
+    # X giờ / X hrs / Xh
+    match = re.search(r"(\d+)\s*(giờ|hr|h\b)", date_str)
+    if match:
+        return now - timedelta(hours=int(match.group(1)))
+        
+    # X ngày / X days / Xd
+    match = re.search(r"(\d+)\s*(ngày|day|d\b)", date_str)
+    if match:
+        return now - timedelta(days=int(match.group(1)))
+        
+    # X tuần / X weeks / Xw
+    match = re.search(r"(\d+)\s*(tuần|week|w\b)", date_str)
+    if match:
+        return now - timedelta(weeks=int(match.group(1)))
+
+    # X tháng / X months
+    match = re.search(r"(\d+)\s*(tháng|month)", date_str)
+    if match and "lúc" not in date_str and "at" not in date_str:
+        return now - timedelta(days=int(match.group(1)) * 30)
+
+    # 2. Hôm qua lúc H:M / Yesterday at H:M
+    if "hôm qua" in date_str or "yesterday" in date_str:
+        time_match = re.search(r"(\d{1,2})[:h](\d{2})", date_str)
+        hour = int(time_match.group(1)) if time_match else 12
+        minute = int(time_match.group(2)) if time_match else 0
+        yesterday = now - timedelta(days=1)
+        return datetime(yesterday.year, yesterday.month, yesterday.day, hour, minute)
+
+    # 3. Ngày cụ thể: X tháng Y [năm Z] [lúc H:M] / Month X[, Year] [at H:M]
+    month_map = {
+        "tháng 1": 1, "tháng 2": 2, "tháng 3": 3, "tháng 4": 4, "tháng 5": 5, "tháng 6": 6,
+        "tháng 7": 7, "tháng 8": 8, "tháng 9": 9, "tháng 10": 10, "tháng 11": 11, "tháng 12": 12,
+        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
+        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12
+    }
+    
+    # Định dạng tiếng Việt: <ngày> tháng <tháng>[, <năm>] [lúc <giờ>:<phút>]
+    match_vi = re.search(r"(\d{1,2})\s+tháng\s+(\d{1,2})(?:,\s+(\d{4}))?", date_str)
+    if match_vi:
+        day = int(match_vi.group(1))
+        month = int(match_vi.group(2))
+        year = int(match_vi.group(3)) if match_vi.group(3) else now.year
+        
+        time_match = re.search(r"lúc\s+(\d{1,2})[:h](\d{2})", date_str)
+        hour = int(time_match.group(1)) if time_match else 12
+        minute = int(time_match.group(2)) if time_match else 0
+        
+        try:
+            return datetime(year, month, day, hour, minute)
+        except ValueError:
+            pass
+
+    # Định dạng tiếng Anh: <tên tháng> <ngày>[th|st|nd|rd][, <năm>] [at <giờ>:<phút>]
+    for m_name, m_val in month_map.items():
+        if m_name in date_str:
+            match_en = re.search(r"\b" + re.escape(m_name) + r"\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s+(\d{4}))?", date_str)
+            if match_en:
+                day = int(match_en.group(1))
+                month = m_val
+                year = int(match_en.group(2)) if match_en.group(2) else now.year
+                
+                time_match = re.search(r"(?:at|lúc)\s+(\d{1,2})[:h](\d{2})", date_str)
+                hour = int(time_match.group(1)) if time_match else 12
+                minute = int(time_match.group(2)) if time_match else 0
+                
+                try:
+                    return datetime(year, month, day, hour, minute)
+                except ValueError:
+                    pass
+
+    return None
 
 
 # ============================================================
@@ -315,17 +409,84 @@ class FacebookGroupScraper:
 
                 # Lấy link bài viết (nếu có)
                 post_url = ""
-                time_link = await article.query_selector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story_fbid"]')
+                time_link = None
+                
+                # Tìm tất cả anchor trong thẻ bài viết
+                anchors = await article.query_selector_all('a')
+                for a in anchors:
+                    href = await a.get_attribute("href") or ""
+                    # Đường dẫn chứa __cft__[0] và không trỏ tới link nhóm chung hay link user
+                    if "__cft__[0]" in href and not ("/groups/" in href and "/posts/" not in href and "/permalink/" not in href) and not ("/user/" in href):
+                        time_link = a
+                        break
+                
+                # Nếu không tìm thấy bằng __cft__, thử các selector cũ
+                if not time_link:
+                    time_link = await article.query_selector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story_fbid"]')
+                
                 if time_link:
-                    post_url = await time_link.get_attribute("href") or ""
-                    if post_url and not post_url.startswith("http"):
-                        post_url = "https://www.facebook.com" + post_url
+                    href = await time_link.get_attribute("href") or ""
+                    
+                    # Trích xuất Group ID/Name nếu có link nhóm trong bài viết
+                    group_id = ""
+                    for a in anchors:
+                        g_href = await a.get_attribute("href") or ""
+                        match_g = re.search(r"/groups/([^/?]+)", g_href)
+                        if match_g:
+                            group_id = match_g.group(1)
+                            break
+                    
+                    # Nếu link bắt đầu bằng ? (relative query parameter)
+                    if href.startswith("?"):
+                        if group_id:
+                            post_url = f"https://www.facebook.com/groups/{group_id}/" + href
+                        elif "/groups/" in group_url:
+                            # Dùng group_url hiện tại làm fallback
+                            match_g = re.search(r"/groups/([^/?]+)", group_url)
+                            if match_g:
+                                post_url = f"https://www.facebook.com/groups/{match_g.group(1)}/" + href
+                            else:
+                                post_url = "https://www.facebook.com" + href
+                        else:
+                            post_url = "https://www.facebook.com" + href
+                    else:
+                        post_url = href
+                        if post_url and not post_url.startswith("http"):
+                            post_url = "https://www.facebook.com" + post_url
 
-                # Lấy timestamp (thường nằm trong aria-label của link thời gian)
+                # Lấy timestamp
                 timestamp = ""
-                time_el = await article.query_selector('span[id] > a > span, abbr[data-utime]')
-                if time_el:
-                    timestamp = (await time_el.inner_text()).strip()
+                if time_link:
+                    # Chạy đoạn script giải mã ngày tháng
+                    js_deobfuscate = """(el) => {
+                        let spans = Array.from(el.querySelectorAll('span')).filter(s => s.querySelectorAll('span').length === 0);
+                        let visibleSpans = [];
+                        for (let s of spans) {
+                            let style = window.getComputedStyle(s);
+                            if (style.position === 'relative') {
+                                visibleSpans.push({
+                                    text: s.textContent,
+                                    order: parseInt(style.order || 0, 10)
+                                });
+                            }
+                        }
+                        visibleSpans.sort((a, b) => a.order - b.order);
+                        return visibleSpans.map(x => x.text).join('').trim();
+                    }"""
+                    try:
+                        timestamp = await time_link.evaluate(js_deobfuscate)
+                    except Exception as e:
+                        logger.warning(f"Lỗi giải mã JS timestamp: {e}")
+                        
+                # Fallback lấy timestamp cũ nếu de-obfuscation bị trống
+                if not timestamp:
+                    time_el = await article.query_selector('span[id] > a > span, abbr[data-utime]')
+                    if time_el:
+                        timestamp = (await time_el.inner_text()).strip()
+
+                # Bỏ qua các card lọc hoặc quảng cáo không có link hoặc timestamp
+                if not post_url or not timestamp:
+                    continue
 
                 post = make_post(
                     text=text,
@@ -375,11 +536,27 @@ class FacebookGroupScraper:
 
             new_posts = await self._extract_posts_from_page(group_url)
 
-            # Chỉ giữ bài mới chưa thấy
+            # Chỉ giữ bài mới chưa thấy và còn hạn tuyển dụng
+            has_old_post = False
             for post in new_posts:
                 if post["content_hash"] not in seen_hashes:
                     seen_hashes.add(post["content_hash"])
+                    
+                    # Kiểm tra ngày đăng
+                    dt = parse_facebook_date(post["timestamp"])
+                    if dt:
+                        age = datetime.now() - dt
+                        if age.days > MAX_POST_AGE_DAYS:
+                            logger.info(f"  Bỏ qua bài viết cũ ({age.days} ngày): {post['text'][:50]}...")
+                            has_old_post = True
+                            continue
+                    
                     all_posts.append(post)
+
+            # Nếu phát hiện bài viết cũ (để tránh dừng do bài ghim, chỉ dừng khi đã có một số bài viết)
+            if has_old_post and len(all_posts) > 2:
+                logger.info(f"  Đã phát hiện bài viết cũ hơn {MAX_POST_AGE_DAYS} ngày. Dừng cuộn nhóm sớm.")
+                break
 
             # Cuộn xuống để load thêm
             await human_scroll(self._page)

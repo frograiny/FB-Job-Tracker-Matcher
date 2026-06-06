@@ -17,8 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_PATH = "/home/truongan/my_agent_project/jobs.db"
-DASHBOARD_PATH = "/home/truongan/my_agent_project/job_dashboard.html"
+from fb_config import DATABASE_PATH as DB_PATH, DASHBOARD_PATH
+
 
 # Global state for scraping
 scrape_in_progress = False

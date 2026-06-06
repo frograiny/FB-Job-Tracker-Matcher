@@ -1,0 +1,15 @@
+[Unit]
+Description=Facebook Job Tracker FastAPI Web Application
+After=network.target
+
+[Service]
+User={USER}
+WorkingDirectory={WORKING_DIR}
+ExecStart={WORKING_DIR}/.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+Environment="PATH={WORKING_DIR}/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="GEMINI_API_KEY={GEMINI_API_KEY}"
+
+[Install]
+WantedBy=multi-user.target

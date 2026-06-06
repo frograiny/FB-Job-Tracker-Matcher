@@ -1398,13 +1398,13 @@ class JobDatabase:
             const filtered = jobs.filter(job => {
                 const company = (job.company || '').toLowerCase();
                 const position = (job.position || '').toLowerCase();
-                const matched = (job.matched_skills || '').toLowerCase();
-                const skillsList = Array.isArray(job.matched_skills) ? job.matched_skills.join(" ") : matched;
+                const matched = Array.isArray(job.matched_skills) ? job.matched_skills.join(" ") : (job.matched_skills || '');
+                const skillsList = matched.toLowerCase();
                 
                 const searchMatch = !search || 
                                     company.includes(search) || 
                                     position.includes(search) || 
-                                    skillsList.toLowerCase().includes(search);
+                                    skillsList.includes(search);
 
                 const scoreMatch = job.match_score >= minScore;
 

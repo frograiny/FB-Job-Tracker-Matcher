@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  fb-job-tracker:
+    build: .
+    container_name: fb_job_tracker
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist the SQLite database
+      - ./jobs.db:/app/jobs.db
+      # Persist the Facebook cookies
+      - ./fb_cookies.json:/app/fb_cookies.json
+      # Persist CV files if updated
+      - ./cv.txt:/app/cv.txt
+      - ./cv_vi.txt:/app/cv_vi.txt
+      # Mount reports directory
+      - ./actual_applications:/app/actual_applications
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fb-job-tracker
+    runtime: docker
+    repo: https://github.com/frograiny/FB-Job-Tracker-Matcher
+    plan: standard
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+    disk:
+      name: fb-job-data
+      mountPath: /app/data
+      sizeGB: 1

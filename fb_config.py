@@ -9,11 +9,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # ============================================================
 # 1. ĐƯỜNG DẪN FILE
 # ============================================================
-COOKIES_PATH = os.path.join(BASE_DIR, "fb_cookies.json")
-DATABASE_PATH = os.path.join(BASE_DIR, "jobs.db")
-CV_PATH = os.path.join(BASE_DIR, "cv.txt")
-CV_VI_PATH = os.path.join(BASE_DIR, "cv_vi.txt")
-REPORT_DIR = BASE_DIR  # Thư mục xuất báo cáo
+DATA_DIR = "/app/data" if os.path.exists("/app/data") else BASE_DIR
+COOKIES_PATH = os.path.join(DATA_DIR, "fb_cookies.json")
+DATABASE_PATH = os.path.join(DATA_DIR, "jobs.db")
+CV_PATH = os.path.join(DATA_DIR, "cv.txt") if os.path.exists(os.path.join(DATA_DIR, "cv.txt")) else os.path.join(BASE_DIR, "cv.txt")
+CV_VI_PATH = os.path.join(DATA_DIR, "cv_vi.txt") if os.path.exists(os.path.join(DATA_DIR, "cv_vi.txt")) else os.path.join(BASE_DIR, "cv_vi.txt")
+REPORT_DIR = DATA_DIR  # Thư mục xuất báo cáo
+DASHBOARD_PATH = os.path.join(BASE_DIR, "job_dashboard.html")
+
 
 # ============================================================
 # 2. DANH SÁCH NHÓM FACEBOOK CẦN THEO DÕI
@@ -59,6 +62,8 @@ ACTION_DELAY_MIN = 1.0      # Delay tối thiểu giữa các thao tác khác
 ACTION_DELAY_MAX = 3.0      # Delay tối đa
 MAX_SCROLLS_PER_GROUP = 15  # Số lần cuộn tối đa mỗi nhóm
 POSTS_PER_GROUP_LIMIT = 30  # Giới hạn bài viết mỗi nhóm
+MAX_POST_AGE_DAYS = 7       # Chỉ quét bài viết trong vòng 7 ngày gần đây
+
 
 # Viewport giả lập (giống màn hình laptop thật)
 VIEWPORT_WIDTH = 1366

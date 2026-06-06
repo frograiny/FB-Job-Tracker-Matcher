@@ -31,3 +31,5 @@ truongan.pdf
 *.pdf
 *.html
 !job_dashboard.html
+*.log
+
