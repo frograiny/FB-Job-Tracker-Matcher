@@ -182,7 +182,7 @@ class JobDatabase:
         missing_skills = json.dumps(cv_match.get("missing_skills", []), ensure_ascii=False)
 
         self._conn.execute(
-            """INSERT INTO job_listings 
+            """INSERT OR IGNORE INTO job_listings 
                (post_hash, company, position, requirements, salary, location,
                 contact, deadline, work_type, experience_level,
                 match_score, matched_skills, missing_skills, recommendation,
