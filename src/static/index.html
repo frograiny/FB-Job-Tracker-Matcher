@@ -563,7 +563,48 @@
         }
 
         /* Action buttons */
-        .detail-actions { display: flex; gap: 8px; margin-top: 20px; }
+        .detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+        /* Contact box */
+        .contact-box {
+            background: var(--green-dim);
+            border: 1px solid rgba(5,150,105,.2);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
+        .contact-box .contact-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+        .contact-box .contact-val {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--fg-0);
+            word-break: break-all;
+            cursor: pointer;
+            user-select: all;
+        }
+        .contact-box .contact-val:hover { text-decoration: underline; }
+
+        /* Source badge */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--fg-2);
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-decoration: none;
+        }
+        .source-badge:hover { color: var(--accent); border-color: var(--accent); }
 
         /* Loading state */
         .loading-overlay {
@@ -1001,10 +1042,24 @@
             <div class="ai-box">${esc(j.recommendation)}</div>
         </div>` : ''}
 
+        ${j.contact ? `
+        <div class="contact-box">
+            <div class="contact-label">Thông tin liên hệ</div>
+            <div class="contact-val" onclick="copyContact('${j.contact.replace(/'/g, "\\'")}')"
+                 title="Click để sao chép">${esc(j.contact)}</div>
+        </div>` : ''}
+
         <div class="detail-actions">
-            ${j.post_url ? `<a href="${j.post_url}" target="_blank" rel="noopener" class="btn">Xem bài gốc</a>` : ''}
-            ${j.contact ? `<button class="btn" onclick="copyContact('${esc(j.contact)}')">Sao chép liên hệ</button>` : ''}
-        </div>`;
+            ${(j.post_url || j.group_url) ? `<a href="${esc(j.post_url || j.group_url)}" target="_blank" rel="noopener" class="btn btn-primary">Xem bài gốc trên FB</a>` : ''}
+            ${j.contact ? `<button class="btn" onclick="copyContact('${j.contact.replace(/'/g, "\\'")}')">Sao chép liên hệ</button>` : ''}
+            ${j.group_url && j.post_url ? `<a href="${esc(j.group_url)}" target="_blank" rel="noopener" class="source-badge">Xem nhóm</a>` : ''}
+        </div>
+        ${
+            (!j.post_url && !j.group_url && !j.contact) ? `
+        <div style="background:var(--amber-dim);border:1px solid rgba(217,119,6,.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--amber);margin-top:16px">
+            Không có link bài viết — thử quét lại hoặc tìm trực tiếp trên Facebook
+        </div>` : ''
+        }`;
     }
 
     function copyContact(text) {

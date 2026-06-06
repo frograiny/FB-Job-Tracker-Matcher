@@ -413,20 +413,38 @@ class FacebookGroupScraper:
                 
                 # Tìm tất cả anchor trong thẻ bài viết
                 anchors = await article.query_selector_all('a')
+                
+                # Ưu tiên 1: Link chứa /posts/ hoặc /permalink/ — đây là permalink bài viết thật
                 for a in anchors:
                     href = await a.get_attribute("href") or ""
-                    # Đường dẫn chứa __cft__[0] và không trỏ tới link nhóm chung hay link user
-                    if "__cft__[0]" in href and not ("/groups/" in href and "/posts/" not in href and "/permalink/" not in href) and not ("/user/" in href):
+                    if "/posts/" in href or "/permalink/" in href or "story_fbid=" in href:
                         time_link = a
+                        post_url = href if href.startswith("http") else "https://www.facebook.com" + href
                         break
                 
-                # Nếu không tìm thấy bằng __cft__, thử các selector cũ
-                if not time_link:
-                    time_link = await article.query_selector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story_fbid"]')
+                # Ưu tiên 2: Link chứa __cft__ nhưng KHÔNG phải homepage nhóm (phải có /posts/ hoặc #?)
+                if not post_url:
+                    for a in anchors:
+                        href = await a.get_attribute("href") or ""
+                        if "__cft__[0]" in href:
+                            # Loại bỏ link homepage nhóm (dạng /groups/ID/?__cft__)
+                            # Giữ lại link có path cụ thể hơn
+                            if "/posts/" in href or "/permalink/" in href:
+                                time_link = a
+                                post_url = href if href.startswith("http") else "https://www.facebook.com" + href
+                                break
                 
-                if time_link:
-                    href = await time_link.get_attribute("href") or ""
-                    
+                # Ưu tiên 3: Nếu vẫn không tìm được, lấy link __cft__ bất kỳ (kể cả link nhóm) làm fallback
+                if not post_url:
+                    for a in anchors:
+                        href = await a.get_attribute("href") or ""
+                        if "__cft__[0]" in href and href not in (group_url,):
+                            time_link = a
+                            post_url = href if href.startswith("http") else "https://www.facebook.com" + href
+                            break
+
+                # Nếu link bắt đầu bằng ? (relative query parameter)
+                if post_url and post_url.startswith("?"):
                     # Trích xuất Group ID/Name nếu có link nhóm trong bài viết
                     group_id = ""
                     for a in anchors:
@@ -436,17 +454,13 @@ class FacebookGroupScraper:
                             group_id = match_g.group(1)
                             break
                     
-                    # Nếu link bắt đầu bằng ? (relative query parameter)
-                    if href.startswith("?"):
-                        if group_id:
-                            post_url = f"https://www.facebook.com/groups/{group_id}/" + href
-                        elif "/groups/" in group_url:
-                            # Dùng group_url hiện tại làm fallback
-                            match_g = re.search(r"/groups/([^/?]+)", group_url)
-                            if match_g:
-                                post_url = f"https://www.facebook.com/groups/{match_g.group(1)}/" + href
-                            else:
-                                post_url = "https://www.facebook.com" + href
+                    if group_id:
+                        post_url = f"https://www.facebook.com/groups/{group_id}/" + post_url
+                    elif "/groups/" in group_url:
+                        # Dùng group_url hiện tại làm fallback
+                        match_g = re.search(r"/groups/([^/?]+)", group_url)
+                        if match_g:
+                            post_url = f"https://www.facebook.com/groups/{match_g.group(1)}/" + post_url
                         else:
                             post_url = "https://www.facebook.com" + href
                     else:
@@ -484,10 +498,8 @@ class FacebookGroupScraper:
                     if time_el:
                         timestamp = (await time_el.inner_text()).strip()
 
-                # Bỏ qua các card lọc hoặc quảng cáo không có link hoặc timestamp
-                if not post_url or not timestamp:
-                    continue
-
+                # Chỉ bỏ qua bài quá ngắn (đã lọc ở trên) hoặc không có nội dung gì để xử lý
+                # Không bắt buộc phải có post_url — group_url là fallback đủ để user biết nguồn
                 post = make_post(
                     text=text,
                     author=author,
