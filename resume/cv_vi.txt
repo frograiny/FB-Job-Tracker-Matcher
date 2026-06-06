@@ -1,45 +1,40 @@
 ĐINH TRƯỜNG AN
-Số điện thoại: 0354160132
-Email: truongan1203.hp@gmail.com
-GitHub: github.com/blackbear117 | github.com/frograiny
+0354160132 · truongan1203.hp@gmail.com · github.com/blackbear117 · github.com/frograiny
+
+DỰ ÁN
+
+AI Security WAF & Active Vulnerability Scanner | Python · TensorFlow/Keras · Flask         01/2026 – 05/2026
+▸ Phát triển bộ quét lỗ hổng chủ động và WAF thụ động sử dụng mô hình Bi-LSTM đạt 99.68% accuracy
+  phân loại 7 loại tấn công (SQLi, XSS, SSRF, CSRF, Path Traversal, Command Injection) trên 58K+ mẫu.
+▸ Xây dựng module AI Hacker Brain sử dụng Groq API (Llama) để sinh payload động và kiểm thử tự động.
+▸ Triển khai Flask reverse-proxy WAF với rate limiting, auto IP blacklisting và giao diện giám sát real-time.
+
+Autonomous Job Application & Recruitment AI Agent | Python · Google Antigravity SDK · Gemini API   03/2026 – 06/2026
+▸ Thiết kế AI Agent đa công cụ tự động phân tích CV, tìm kiếm việc làm và ghi nhận lịch sử ứng tuyển
+  sử dụng Google Antigravity SDK.
+▸ Xây dựng các tool chuyên biệt: phân tích resume, tìm kiếm database tuyển dụng, xuất cover letter
+  theo chuẩn ATS dạng Markdown có cấu trúc.
+
+Medical Cell Segmentation & Counting System | Python · PyTorch · OpenCV · Flask           03/2026 – 05/2026
+▸ Xây dựng pipeline deep learning end-to-end sử dụng U-Net trên MoNuSeg 2018 để phân vùng và đếm
+  nhân tế bào tự động trên mô bệnh học.
+▸ Phát triển module tiền xử lý ảnh với overlap patching; đóng gói toàn bộ inference stack bằng Docker.
+▸ Phát triển Flask web app với biểu đồ động và sinh báo cáo PDF tự động cho nghiên cứu lâm sàng.
+
+HUS Scientific Works | React · TypeScript · FastAPI · SQL · Docker                        01/2026 – 03/2026
+▸ Kiến trúc hệ thống lưu trữ metadata bài báo khoa học VNU sử dụng Repository Pattern với
+  React/TypeScript frontend và FastAPI backend.
+▸ Triển khai tìm kiếm debounced với type-safe interfaces và semantic search API bằng AI;
+  deploy full-stack qua Docker Compose. (Live: hus-scientificworks.vercel.app)
+
+KỸ NĂNG
+Ngôn ngữ lập trình: Python, C#, C/C++, SQL, Go, JavaScript, TypeScript
+LLM & Agent: Google Antigravity SDK, Agentic Workflows, Prompt Engineering, Token Optimization
+Deep Learning & AI: PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM, Model Fine-tuning
+Web Development: React, FastAPI, Flask, Vite, REST API Design, Responsive UI/UX
+Hệ thống: Stream Processing, Async/Parallel Programming, System Architecture, Repository Pattern
+Công cụ: Git, Docker, Docker Compose, Linux Systems
 
 HỌC VẤN
-Trường Đại học Khoa học Tự nhiên - ĐHQGHN
-Cử nhân Khoa học Máy tính và Thông tin (Th9. 2022 -- Th6. 2026)
-Trọng tâm đào tạo: Trí tuệ nhân tạo & Học sâu, Hệ thống AI Agent, Phát triển ứng dụng Web và Kiến trúc phần mềm.
-
-KỸ NĂNG KỸ THUẬT
-Ngôn ngữ lập trình: Python, C#, C/C++, SQL, Go, JavaScript, TypeScript
-Công nghệ LLM & Agent: Google Antigravity SDK, Agentic Workflows, Prompt Engineering, Định dạng đầu ra Markdown cấu trúc, Tối ưu hóa Token tiêu thụ
-Học sâu & AI: PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM, Fine-tuning mô hình, Trích xuất đặc trưng
-Phát triển Web: React, FastAPI, Flask, Vite, Thiết kế REST API, Thiết kế Responsive UI/UX
-Hệ thống & Kiến trúc: Xử lý luồng dữ liệu (Stream Processing), Lập trình bất đồng bộ/Song song, Kiến trúc hệ thống, Repository Pattern
-An ninh mạng & DevSecOps: Đánh giá bảo mật (Penetration Testing), OWASP Top 10, Cấu hình WAF, Burp Suite, SonarQube
-Công cụ & Khung phát triển: Git, Docker, Docker Compose, Hệ điều hành Linux, Arduino IDE
-
-DỰ ÁN TIÊU BIỂU
-1. Tường lửa WAF & Bộ quét lỗ hổng bảo mật ứng dụng AI (Th1. 2026 -- Th5. 2026)
-- Xây dựng công cụ quét lỗ hổng bảo mật chủ động và hệ thống Tường lửa ứng dụng Web (WAF) thụ động dựa trên mô hình Học sâu (kiến trúc Bi-LSTM) đạt độ chính xác phân loại tấn công lên đến 99.68%.
-- Thiết lập các payload mô phỏng lỗ hổng đa vector (SQLi, XSS, SSRF, Path Traversal) để tự động hóa quét lỗi bảo mật và tạo báo cáo ở dạng JSON và Markdown.
-- Thiết kế giao diện bảng điều khiển trực quan (dashboard) theo phong cách Glassmorphism, hiển thị trực quan các đợt tấn công thời gian thực, sức khỏe máy chủ và chỉ số hệ thống.
-- GitHub: https://github.com/frograiny/ai_security
-
-2. Hệ thống AI Agent tự động hóa tìm kiếm việc làm & tuyển dụng (Th3. 2026 -- Th6. 2026)
-- Ứng dụng Google Antigravity SDK để phát triển AI Agent tự quản lý đa công cụ có khả năng tự động hóa phân tích CV cá nhân, truy vấn tìm kiếm việc làm và ghi nhật ký ứng tuyển.
-- Thiết kế các Custom Tools tích hợp khả năng đọc tài liệu thô, gọi API cơ sở dữ liệu tuyển dụng và xuất lịch sử theo dõi ứng tuyển tự động dạng CSV.
-- Tối ưu hóa cấu trúc chỉ thị hệ thống và chuỗi prompt nhằm sinh thư xin việc (Cover Letter) dạng Markdown chuyên nghiệp, đáp ứng hoàn hảo tiêu chí của hệ thống ATS.
-
-3. Hệ thống phân tách và đếm tế bào y tế (Th3. 2026 -- Th5. 2026)
-- Xây dựng đường ống học máy hoàn chỉnh sử dụng kiến trúc mạng U-Net huấn luyện trên bộ dữ liệu ảnh y tế MoNuSeg 2018 phục vụ phân tách và đếm nhân tế bào tự động.
-- Thiết kế module tiền xử lý ảnh (patching) xử lý chồng lấp và chuẩn hóa, tăng độ hội tụ của mô hình và cải thiện độ chính xác trên mẫu mô bệnh học.
-- Phát triển dashboard dựa trên Flask hiển thị biểu đồ phân tích động trực quan hóa mẫu tế bào và tích hợp công cụ tự động xuất báo cáo định dạng PDF.
-
-4. HUS Scientific Works (Th1. 2026 -- Th3. 2026)
-- Thiết kế kiến trúc kho lưu trữ siêu dữ liệu hiệu năng cao cho các công bố khoa học của Đại học Quốc gia bằng mô hình Repository Pattern tách biệt giữa React/TypeScript (Frontend) và FastAPI (Backend).
-- Xây dựng các custom React hooks tối ưu hóa tìm kiếm (debounced search) với kiểu dữ liệu type-safe, tích hợp lớp API tìm kiếm ngữ nghĩa bằng AI.
-- Đóng gói triển khai toàn bộ hệ thống bằng Docker Compose với các container dịch vụ biệt lập giữa frontend, backend và database.
-- Link sản phẩm: https://hus-scientific-works.vercel.app/
-
-5. Công cụ dịch thuật clipboard đa nền tảng chạy ngầm (Th9. 2025 -- Th12. 2025)
-- Phát triển công cụ dịch thuật không phụ thuộc thư viện ngoài hoạt động mượt mà trên Linux, macOS và Windows thông qua API gốc (notify-send, AppleScript, PowerShell).
-- Triển khai dịch vụ daemon trên Linux theo dõi trực tiếp sự kiện chọn văn bản của hệ thống, tự động dịch và đẩy kết quả phản hồi qua thông báo nổi màn hình.
+Cử nhân Khoa học Máy tính & Thông tin | Đại học Khoa học Tự nhiên - ĐHQG TP.HCM
+Chuyên sâu: Trí tuệ nhân tạo & Machine Learning, Agentic Workflows, Phát triển Web, Kiến trúc phần mềm.

@@ -1,45 +1,51 @@
 DINH TRUONG AN
-Phone: 0354160132
-Email: truongan1203.hp@gmail.com
-GitHub: github.com/blackbear117 | github.com/frograiny
+0354160132 · truongan1203.hp@gmail.com · github.com/blackbear117 · github.com/frograiny
 
-EDUCATION
-University of Science - VNU
-Bachelor of Science in Computer and Information Science (Sep. 2022 -- June 2026)
-Core Focus: Artificial Intelligence & Machine Learning, Agentic Workflows, Web Application Development, and Software Architecture.
+PROJECTS
+
+AI Security WAF & Active Vulnerability Scanner | Python · TensorFlow/Keras · Flask         Jan 2026 – May 2026
+▸ Developed an active vulnerability scanner and passive WAF powered by a Bi-LSTM deep learning model
+  achieving 99.68% accuracy classifying 7 attack categories (SQLi, XSS, SSRF, CSRF, Path Traversal,
+  Command Injection) across 58K+ training samples.
+▸ Implemented multi-vector vulnerability simulation payloads to automate scanning and generate
+  vulnerability reports in JSON and Markdown formats.
+▸ Built an AI Hacker Brain module using Groq API (Llama) for dynamic payload generation and active
+  auditing via AI chaining.
+▸ Deployed a Flask reverse-proxy WAF with rate limiting, auto IP blacklisting, and a glassmorphism web
+  console for real-time threat monitoring.
+
+Autonomous Job Application & Recruitment AI Agent | Python · Google Antigravity SDK · Gemini API   Mar 2026 – Jun 2026
+▸ Engineered an autonomous multi-tool AI Agent using Google Antigravity SDK to automate CV parsing,
+  job search queries, and application logging.
+▸ Designed custom functional tools for parsing resumes, searching recruitment databases, and exporting
+  ATS-friendly cover letters in structured Markdown.
+
+Medical Cell Segmentation & Counting System | Python · PyTorch · OpenCV · Flask           Mar 2026 – May 2026
+▸ Built an end-to-end deep learning pipeline using U-Net trained on MoNuSeg 2018 for automated cell
+  nuclei segmentation and counting on histopathological tissue.
+▸ Engineered preprocessing modules for image patching with overlap handling and normalization;
+  containerized the full inference stack with Docker.
+▸ Developed a Flask web application with dynamic diagram rendering and automated PDF report
+  generation for clinical research use.
+
+HUS Scientific Works | React · TypeScript · FastAPI · SQL · Docker                        Jan 2026 – Mar 2026
+▸ Architected a high-throughput metadata repository for VNU academic publications using decoupled
+  Repository Pattern with React/TypeScript frontend and FastAPI backend.
+▸ Implemented debounced search with type-safe interfaces and an AI-powered semantic search API
+  layer; orchestrated full-stack deployment via Docker Compose. (Live: hus-scientificworks.vercel.app)
 
 TECHNICAL SKILLS
 Languages: Python, C#, C/C++, SQL, Go, JavaScript, TypeScript
-LLM & Agent Engineering: Google Antigravity SDK, Agentic Workflows, Prompt Engineering, Structured Markdown outputs, Token Optimization
-Deep Learning & AI: PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM, Model Fine-tuning, Feature Extraction
+LLM & Agent Engineering: Google Antigravity SDK, Agentic Workflows, Prompt Engineering,
+  Structured Markdown Outputs, Token Optimization
+Deep Learning & AI: PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM,
+  Model Fine-tuning, Feature Extraction
 Web Development: React, FastAPI, Flask, Vite, REST API Design, Responsive UI/UX
-Systems & Architecture: Stream Processing, Async/Parallel Programming, System Architecture, Repository Pattern
-Cybersecurity & DevSecOps: Penetration Testing, OWASP Top 10, WAF Configuration, Burp Suite, SonarQube
-Frameworks & Tools: Git, Docker, Docker Compose, Linux Systems, Arduino IDE
+Systems & Architecture: Stream Processing, Async/Parallel Programming, System Architecture,
+  Repository Pattern
+Frameworks & Tools: Git, Docker, Docker Compose, Linux Systems
 
-PROJECTS
-1. AI Security WAF & Active Vulnerability Scanner (Jan. 2026 -- May 2026)
-- Developed an active vulnerability scanner and a passive Web Application Firewall (WAF) powered by a Deep Learning model (Bi-LSTM architecture) achieving 99.68% accuracy in classifying payload attacks.
-- Implemented multi-vector vulnerability simulation payloads (SQLi, XSS, SSRF, Path Traversal) to automate system scanning and vulnerability report generation in JSON and Markdown formats.
-- Built a responsive web console dashboard featuring glassmorphism UI design, live threat detection, server health monitoring, and system metrics visualization.
-- GitHub: https://github.com/frograiny/ai_security
-
-2. Autonomous Job Application & Recruitment AI Agent (Mar. 2026 -- Jun. 2026)
-- Engineered an autonomous multi-tool AI Agent utilizing Google Antigravity SDK to automate CV profile parsing, job search queries, and application logging.
-- Designed custom functional tools for parsing text-based resumes, searching recruitment databases, and exporting formatted spreadsheet trackers (CSV).
-- Optimized LLM system instructions and prompt chains to generate highly tailored, ATS-friendly cover letters structured in clean Markdown.
-
-3. Medical Cell Segmentation & Counting System (Mar. 2026 -- May 2026)
-- Built an end-to-end Deep Learning pipeline using U-Net architecture trained on the MoNuSeg 2018 medical imaging dataset for automated cell nuclei segmentation and counting.
-- Engineered preprocessing modules for image patching with overlap handling and normalization, improving model convergence and segmentation accuracy on histopathological tissue samples.
-- Developed a Flask-based web application with dynamic diagram rendering for interactive cell analysis visualization and automated PDF report generation.
-
-4. HUS Scientific Works (Jan. 2026 -- Mar. 2026)
-- Architected a high-throughput metadata repository system for VNU academic publications using a decoupled Repository Pattern with React/TypeScript frontend and FastAPI backend.
-- Implemented custom React hooks for debounced search with type-safe interfaces, and integrated an AI-powered semantic search API layer for intelligent query matching.
-- Orchestrated full-stack deployment via Docker Compose with isolated service containers for frontend, backend, and database layers.
-- Live Demo: https://hus-scientific-works.vercel.app/
-
-5. Cross-Platform Clipboard Translator (Sep. 2025 -- Dec. 2025)
-- Built a zero-dependency, cross-platform translation utility supporting Linux, macOS, and Windows via native system APIs (notify-send, AppleScript, PowerShell).
-- Implemented a Linux daemon listener that monitors text selection events in real-time, automatically translates highlighted text, and delivers results through desktop notifications.
+EDUCATION
+B.Sc. Computer and Information Science | University of Science - VNU
+Core Focus: Artificial Intelligence & Machine Learning, Agentic Workflows, Web Application Development,
+and Software Architecture.
