@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Job Tracker & CV Matcher</title>
+    <meta name="description" content="Hệ thống tự động quét tin tuyển dụng Facebook, phân tích AI và đối khớp CV thông minh">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <style>
+        /* ── Design tokens ── */
+        :root {
+            color-scheme: light dark;
+            /* Light */
+            --bg-0: #f8f9fc;
+            --bg-1: #ffffff;
+            --bg-2: #f1f4f9;
+            --bg-3: #e8edf5;
+            --fg-0: #0d1117;
+            --fg-1: #3d4451;
+            --fg-2: #6b7280;
+            --border: #e2e6ef;
+            --border-strong: #c8d0de;
+            --accent: #2563eb;
+            --accent-dim: rgba(37,99,235,.1);
+            --accent-hover: #1d4ed8;
+            --green: #059669;
+            --green-dim: rgba(5,150,105,.1);
+            --amber: #d97706;
+            --amber-dim: rgba(217,119,6,.1);
+            --red: #dc2626;
+            --red-dim: rgba(220,38,38,.1);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+            --shadow-focus: 0 0 0 3px rgba(37,99,235,.2);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --transition: 150ms cubic-bezier(.4,0,.2,1);
+        }
+
+        [data-theme="dark"] {
+            --bg-0: #09090b;
+            --bg-1: #111115;
+            --bg-2: #18181c;
+            --bg-3: #202026;
+            --fg-0: #f4f4f5;
+            --fg-1: #a1a1aa;
+            --fg-2: #71717a;
+            --border: rgba(255,255,255,.07);
+            --border-strong: rgba(255,255,255,.13);
+            --accent: #3b82f6;
+            --accent-dim: rgba(59,130,246,.12);
+            --accent-hover: #2563eb;
+            --green: #10b981;
+            --green-dim: rgba(16,185,129,.12);
+            --amber: #f59e0b;
+            --amber-dim: rgba(245,158,11,.12);
+            --red: #ef4444;
+            --red-dim: rgba(239,68,68,.12);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+            --shadow-focus: 0 0 0 3px rgba(59,130,246,.25);
+        }
+
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { height: 100%; }
+
+        body {
+            height: 100%;
+            background: var(--bg-0);
+            color: var(--fg-0);
+            font-family: 'Geist', system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ── Layout ── */
+        .layout {
+            display: grid;
+            grid-template-rows: 56px 1fr;
+            height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 20px;
+            background: var(--bg-1);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        .topbar-brand {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            color: var(--fg-0);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .topbar-brand .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .topbar-sep { flex: 1; }
+
+        .topbar-stats {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            color: var(--fg-2);
+            font-size: 13px;
+        }
+
+        .topbar-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-stat strong {
+            color: var(--fg-0);
+            font-weight: 600;
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--bg-1);
+            color: var(--fg-0);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            white-space: nowrap;
+            outline: none;
+        }
+        .btn:hover { background: var(--bg-2); }
+        .btn:focus-visible { box-shadow: var(--shadow-focus); }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: transparent;
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        .btn-icon {
+            padding: 7px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Theme toggle icon */
+        .theme-icon { width: 16px; height: 16px; }
+
+        /* ── Main area ── */
+        .main {
+            display: grid;
+            grid-template-columns: 280px 380px 1fr;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .main { grid-template-columns: 260px 1fr; }
+            .detail-panel { display: none; }
+            .detail-panel.visible { display: flex; }
+        }
+        @media (max-width: 680px) {
+            body { overflow: auto; }
+            .layout { grid-template-rows: 56px auto; }
+            .main { grid-template-columns: 1fr; overflow: visible; }
+            .sidebar, .list-panel { height: auto; overflow: visible; }
+            .topbar-stats { display: none; }
+        }
+
+        /* ── Panels ── */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border);
+        }
+
+        .panel:last-child { border-right: none; }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px 13px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--bg-1);
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--fg-0);
+        }
+
+        .panel-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--fg-2);
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            background: var(--bg-0);
+        }
+
+        .panel-body::-webkit-scrollbar { width: 4px; }
+        .panel-body::-webkit-scrollbar-track { background: transparent; }
+        .panel-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+        /* ── Sidebar ── */
+        .sidebar { background: var(--bg-1); }
+
+        .sidebar .panel-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--bg-1);
+        }
+
+        /* ── Form controls ── */
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--fg-2);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            background: var(--bg-0);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            color: var(--fg-0);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-focus);
+        }
+        .form-input::placeholder { color: var(--fg-2); }
+
+        textarea.form-input {
+            resize: none;
+            height: 100px;
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        select.form-input { cursor: pointer; }
+
+        .range-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+        .range-header { display: flex; justify-content: space-between; align-items: center; }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* CV upload */
+        .upload-zone {
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius-sm);
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: var(--bg-0);
+        }
+        .upload-zone:hover, .upload-zone.drag-over {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+        .upload-zone p { font-size: 12px; color: var(--fg-2); margin-top: 6px; }
+        .upload-zone strong { display: block; font-size: 13px; font-weight: 500; color: var(--fg-0); }
+
+        /* Stats mini grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card {
+            background: var(--bg-0);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+        .stat-card .val {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--fg-0);
+            letter-spacing: -.5px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stat-card .label { font-size: 11px; color: var(--fg-2); }
+
+        /* Scrape log */
+        .scrape-log {
+            display: none;
+            background: var(--bg-0);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            overflow: hidden;
+        }
+        .scrape-log.active { display: block; }
+        .scrape-log-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .scrape-log-lines {
+            font-family: 'Geist Mono', monospace;
+            font-size: 11px;
+            line-height: 1.7;
+            color: var(--fg-2);
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid var(--border-strong);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        /* ── Job cards list ── */
+        .list-panel .panel-body { background: var(--bg-0); }
+
+        .jobs-list { display: flex; flex-direction: column; }
+
+        .job-card {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background var(--transition);
+            position: relative;
+        }
+        .job-card:hover { background: var(--bg-2); }
+        .job-card.active { background: var(--accent-dim); }
+        .job-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .jc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+
+        .jc-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--fg-0);
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .score-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+        .score-high { background: var(--green-dim); color: var(--green); }
+        .score-mid  { background: var(--amber-dim); color: var(--amber); }
+        .score-low  { background: var(--red-dim);   color: var(--red); }
+
+        .jc-company { font-size: 12px; color: var(--fg-1); margin-bottom: 6px; }
+
+        .jc-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+        .jc-meta-item { font-size: 11px; color: var(--fg-2); display: flex; align-items: center; gap: 4px; }
+
+        /* ── Detail panel ── */
+        .detail-panel { background: var(--bg-1); }
+        .detail-panel .panel-body { padding: 24px; background: var(--bg-1); }
+
+        .empty-state {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 10px;
+            padding: 40px;
+            color: var(--fg-2);
+        }
+        .empty-icon { font-size: 40px; opacity: .3; filter: grayscale(1); }
+        .empty-state h3 { font-size: 15px; font-weight: 600; color: var(--fg-1); }
+        .empty-state p { font-size: 13px; max-width: 280px; }
+
+        /* Detail content */
+        .detail-header { padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+
+        .detail-position {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            color: var(--fg-0);
+            margin-bottom: 6px;
+        }
+
+        .detail-company { font-size: 14px; color: var(--fg-1); margin-bottom: 14px; }
+
+        .detail-score-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-0);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+        }
+        .dsb-score {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .score-high { color: var(--green); }
+        .score-mid  { color: var(--amber); }
+        .score-low  { color: var(--red); }
+        .dsb-right { flex: 1; }
+        .dsb-label { font-size: 11px; color: var(--fg-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+        .dsb-track {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .dsb-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .6s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* Meta grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .meta-item {
+            background: var(--bg-0);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+        }
+        .meta-key { font-size: 11px; color: var(--fg-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+        .meta-val { font-size: 13px; font-weight: 500; color: var(--fg-0); }
+
+        /* Sections */
+        .detail-section { margin-bottom: 20px; }
+        .detail-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--fg-2);
+            margin-bottom: 10px;
+        }
+
+        /* Skills */
+        .skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+        .skill-tag {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: var(--radius-xs);
+            border: 1px solid transparent;
+        }
+        .skill-matched { background: var(--green-dim); color: var(--green); border-color: rgba(5,150,105,.2); }
+        .skill-missing  { background: var(--red-dim);   color: var(--red);   border-color: rgba(220,38,38,.2); }
+
+        /* Requirements list */
+        .req-list { display: flex; flex-direction: column; gap: 6px; }
+        .req-item {
+            font-size: 13px;
+            color: var(--fg-1);
+            padding-left: 14px;
+            position: relative;
+        }
+        .req-item::before {
+            content: '–';
+            position: absolute;
+            left: 0;
+            color: var(--fg-2);
+        }
+
+        /* AI Box */
+        .ai-box {
+            background: var(--accent-dim);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--fg-1);
+            line-height: 1.65;
+        }
+
+        /* Action buttons */
+        .detail-actions { display: flex; gap: 8px; margin-top: 20px; }
+
+        /* Loading state */
+        .loading-overlay {
+            position: fixed; inset: 0;
+            background: var(--bg-0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 100;
+            transition: opacity .3s;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-overlay .spinner { width: 28px; height: 28px; border-width: 3px; }
+        .loading-text { font-size: 13px; color: var(--fg-2); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: var(--bg-3);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-size: 13px;
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all .25s;
+            z-index: 200;
+            max-width: 280px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { border-left: 3px solid var(--green); }
+        .toast.error   { border-left: 3px solid var(--red); }
+
+        /* SVG icons (inline) */
+        svg { display: inline-block; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Đang tải dữ liệu...</div>
+</div>
+
+<div class="layout">
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            <div class="dot"></div>
+            FB Job Tracker
+        </div>
+
+        <div class="topbar-stats">
+            <div class="topbar-stat">
+                Bài viết: <strong id="ts-scraped">—</strong>
+            </div>
+            <div class="topbar-stat">
+                Tin tuyển dụng: <strong id="ts-jobs">—</strong>
+            </div>
+            <div class="topbar-stat">
+                Điểm TB: <strong id="ts-avg">—</strong>
+            </div>
+        </div>
+
+        <div class="topbar-sep"></div>
+
+        <div class="topbar-actions">
+            <button class="btn btn-primary" id="scrape-btn" onclick="triggerScrape()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                Quét tin mới
+            </button>
+            <button class="btn btn-icon" id="theme-btn" onclick="toggleTheme()" title="Đổi giao diện">
+                <svg class="theme-icon" id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg class="theme-icon" id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <div class="main">
+
+        <!-- Col 1: Sidebar filters -->
+        <aside class="panel sidebar">
+            <div class="panel-head">
+                <span class="panel-title">Bộ lọc</span>
+            </div>
+            <div class="panel-body">
+
+                <!-- Stats -->
+                <div>
+                    <div class="form-label" style="margin-bottom:8px">Tổng quan</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="val" id="st-scraped">—</div>
+                            <div class="label">Bài viết</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="val" id="st-jobs">—</div>
+                            <div class="label">Việc làm</div>
+                        </div>
+                        <div class="stat-card" style="grid-column:span 2">
+                            <div class="val" id="st-avg">—</div>
+                            <div class="label">Match score trung bình</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="form-group">
+                    <label class="form-label" for="search-input">Tìm kiếm</label>
+                    <input id="search-input" type="text" class="form-input" placeholder="Công ty, vị trí, kỹ năng..." oninput="applyFilters()">
+                </div>
+
+                <!-- Score range -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <div class="range-header">
+                            <span>Match score tối thiểu</span>
+                            <strong id="score-val" style="color:var(--accent)">0%</strong>
+                        </div>
+                    </label>
+                    <input type="range" id="min-score" min="0" max="100" value="0" oninput="document.getElementById('score-val').textContent=this.value+'%'; applyFilters()">
+                </div>
+
+                <!-- Level -->
+                <div class="form-group">
+                    <label class="form-label" for="level-select">Cấp bậc</label>
+                    <select id="level-select" class="form-input" onchange="applyFilters()">
+                        <option value="">Tất cả</option>
+                        <option value="intern">Intern / Thực tập</option>
+                        <option value="fresher">Fresher</option>
+                        <option value="junior">Junior</option>
+                        <option value="mid">Mid-level</option>
+                    </select>
+                </div>
+
+                <!-- CV Upload -->
+                <div class="form-group">
+                    <label class="form-label">CV của bạn</label>
+                    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--fg-2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <strong id="upload-name">Tải lên CV (.pdf, .txt)</strong>
+                        <p>Click hoặc kéo thả file</p>
+                        <input type="file" id="file-input" accept=".txt,.pdf" style="display:none" onchange="handleFile(this.files[0])">
+                    </div>
+                </div>
+
+                <!-- CV textarea -->
+                <div class="form-group">
+                    <label class="form-label" for="cv-text">Nội dung CV (text)</label>
+                    <textarea id="cv-text" class="form-input" placeholder="Hoặc dán nội dung CV vào đây..."></textarea>
+                </div>
+
+                <!-- Scrape log -->
+                <div class="scrape-log" id="scrape-log">
+                    <div class="scrape-log-title">
+                        <div class="spinner" id="scrape-spinner"></div>
+                        Tiến trình quét
+                    </div>
+                    <div class="scrape-log-lines" id="scrape-log-lines"></div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Col 2: Job list -->
+        <section class="panel list-panel">
+            <div class="panel-head">
+                <span class="panel-title">Tin tuyển dụng</span>
+                <span class="panel-badge" id="jobs-count">0 tin</span>
+            </div>
+            <div class="panel-body">
+                <div class="jobs-list" id="jobs-list">
+                    <!-- rendered by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Col 3: Detail -->
+        <section class="panel detail-panel" id="detail-panel">
+            <div class="panel-head">
+                <span class="panel-title">Chi tiết</span>
+                <button class="btn" style="font-size:12px;padding:5px 10px" onclick="document.getElementById('detail-panel').classList.remove('visible')">Đóng</button>
+            </div>
+            <div class="panel-body" id="detail-body">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h3>Chọn một tin để xem chi tiết</h3>
+                    <p>Bộ đối khớp CV sẽ tự động tính điểm dựa trên hồ sơ của bạn</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+    /* ── Globals ── */
+    let allJobs = [];
+    let filteredJobs = [];
+    let selectedId = null;
+    let scrapePolling = null;
+
+    /* ── Theme ── */
+    function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+        if (theme === 'dark') {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'inline-block';
+        } else {
+            sunIcon.style.display = 'inline-block';
+            moonIcon.style.display = 'none';
+        }
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') || getSystemTheme();
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    // Init theme: saved > system
+    (function initTheme() {
+        const saved = localStorage.getItem('theme');
+        applyTheme(saved || getSystemTheme());
+    })();
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+
+    /* ── Toast ── */
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+
+    /* ── API ── */
+    async function fetchStats() {
+        try {
+            const r = await fetch('/api/stats');
+            const d = await r.json();
+            const s1 = d.total_posts_scraped ?? 0;
+            const s2 = d.total_job_listings ?? 0;
+            const s3 = (d.average_match_score ?? 0) + '%';
+            document.getElementById('ts-scraped').textContent = s1;
+            document.getElementById('ts-jobs').textContent = s2;
+            document.getElementById('ts-avg').textContent = s3;
+            document.getElementById('st-scraped').textContent = s1;
+            document.getElementById('st-jobs').textContent = s2;
+            document.getElementById('st-avg').textContent = s3;
+        } catch (e) { console.warn('stats err', e); }
+    }
+
+    async function fetchJobs() {
+        const r = await fetch('/api/jobs?min_score=0');
+        if (!r.ok) throw new Error('API error');
+        return r.json();
+    }
+
+    /* ── Init ── */
+    async function init() {
+        try {
+            [allJobs] = await Promise.all([fetchJobs(), fetchStats()]);
+            applyFilters();
+        } catch (e) {
+            showToast('Không thể tải dữ liệu từ server', 'error');
+            console.error(e);
+        } finally {
+            const overlay = document.getElementById('loading');
+            overlay.classList.add('hidden');
+            setTimeout(() => overlay.remove(), 400);
+        }
+    }
+
+    /* ── Filters ── */
+    function applyFilters() {
+        const q = document.getElementById('search-input').value.toLowerCase().trim();
+        const minScore = parseInt(document.getElementById('min-score').value, 10);
+        const level = document.getElementById('level-select').value.toLowerCase();
+
+        filteredJobs = allJobs.filter(j => {
+            if (j.match_score < minScore) return false;
+            if (level && !String(j.experience_level || '').toLowerCase().includes(level)) return false;
+            if (q) {
+                const hay = [j.company, j.position, j.location,
+                    ...(j.matched_skills || []), ...(j.requirements || [])
+                ].join(' ').toLowerCase();
+                if (!hay.includes(q)) return false;
+            }
+            return true;
+        });
+
+        renderList();
+    }
+
+    /* ── Render list ── */
+    function renderList() {
+        const container = document.getElementById('jobs-list');
+        document.getElementById('jobs-count').textContent = filteredJobs.length + ' tin';
+
+        if (!filteredJobs.length) {
+            container.innerHTML = `<div class="empty-state" style="padding:60px 20px">
+                <div class="empty-icon">🔍</div>
+                <h3>Không có kết quả</h3>
+                <p>Thử bỏ bớt bộ lọc hoặc quét tin mới</p>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = filteredJobs.map(j => {
+            const scoreClass = j.match_score >= 70 ? 'score-high' : j.match_score >= 40 ? 'score-mid' : 'score-low';
+            const company = j.company || 'Không rõ công ty';
+            const metas = [];
+            if (j.salary) metas.push(`<span class="jc-meta-item">${esc(j.salary)}</span>`);
+            if (j.location) metas.push(`<span class="jc-meta-item">${esc(j.location)}</span>`);
+            if (j.work_type) metas.push(`<span class="jc-meta-item">${esc(j.work_type)}</span>`);
+
+            return `<div class="job-card${selectedId === j.id ? ' active' : ''}" data-id="${j.id}" onclick="selectJob(${j.id})">
+                <div class="jc-top">
+                    <div class="jc-title">${esc(j.position || 'Vị trí không rõ')}</div>
+                    <div class="score-pill ${scoreClass}">${j.match_score}%</div>
+                </div>
+                <div class="jc-company">${esc(company)}</div>
+                ${metas.length ? `<div class="jc-meta">${metas.join('')}</div>` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    /* ── Select job ── */
+    function selectJob(id) {
+        selectedId = id;
+        // Update active card
+        document.querySelectorAll('.job-card').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.id) === id);
+        });
+
+        const job = allJobs.find(j => j.id === id);
+        if (!job) return;
+
+        // Show detail on mobile
+        document.getElementById('detail-panel').classList.add('visible');
+        renderDetail(job);
+    }
+
+    /* ── Render detail ── */
+    function renderDetail(j) {
+        const scoreClass = j.match_score >= 70 ? 'score-high' : j.match_score >= 40 ? 'score-mid' : 'score-low';
+        const fillColor = j.match_score >= 70 ? 'var(--green)' : j.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
+
+        const metaItems = [
+            ['Lương', j.salary],
+            ['Địa điểm', j.location],
+            ['Loại hình', j.work_type],
+            ['Cấp bậc', j.experience_level],
+            ['Hạn nộp', j.deadline],
+            ['Liên hệ', j.contact],
+        ].filter(([, v]) => v);
+
+        const matchedSkills = Array.isArray(j.matched_skills) ? j.matched_skills : [];
+        const missingSkills = Array.isArray(j.missing_skills) ? j.missing_skills : [];
+        const requirements  = Array.isArray(j.requirements)   ? j.requirements  : [];
+
+        document.getElementById('detail-body').innerHTML = `
+        <div class="detail-header">
+            <div class="detail-position">${esc(j.position || 'Vị trí không rõ')}</div>
+            <div class="detail-company">${esc(j.company || 'Công ty không rõ')}</div>
+            <div class="detail-score-bar">
+                <div class="dsb-score ${scoreClass}">${j.match_score}%</div>
+                <div class="dsb-right">
+                    <div class="dsb-label">Mức độ phù hợp với CV</div>
+                    <div class="dsb-track">
+                        <div class="dsb-fill" style="width:${j.match_score}%;background:${fillColor}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        ${metaItems.length ? `
+        <div class="meta-grid">
+            ${metaItems.map(([k, v]) => `
+            <div class="meta-item">
+                <div class="meta-key">${k}</div>
+                <div class="meta-val">${esc(v)}</div>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${requirements.length ? `
+        <div class="detail-section">
+            <div class="detail-section-title">Yêu cầu</div>
+            <div class="req-list">
+                ${requirements.map(r => `<div class="req-item">${esc(r)}</div>`).join('')}
+            </div>
+        </div>` : ''}
+
+        ${(matchedSkills.length || missingSkills.length) ? `
+        <div class="detail-section">
+            <div class="detail-section-title">Kỹ năng phù hợp / còn thiếu</div>
+            <div class="skills-wrap">
+                ${matchedSkills.map(s => `<span class="skill-tag skill-matched">${esc(s)}</span>`).join('')}
+                ${missingSkills.map(s => `<span class="skill-tag skill-missing">${esc(s)}</span>`).join('')}
+            </div>
+        </div>` : ''}
+
+        ${j.recommendation ? `
+        <div class="detail-section">
+            <div class="detail-section-title">Nhận xét từ AI</div>
+            <div class="ai-box">${esc(j.recommendation)}</div>
+        </div>` : ''}
+
+        <div class="detail-actions">
+            ${j.post_url ? `<a href="${j.post_url}" target="_blank" rel="noopener" class="btn">Xem bài gốc</a>` : ''}
+            ${j.contact ? `<button class="btn" onclick="copyContact('${esc(j.contact)}')">Sao chép liên hệ</button>` : ''}
+        </div>`;
+    }
+
+    function copyContact(text) {
+        navigator.clipboard.writeText(text).then(() => showToast('Đã sao chép: ' + text, 'success'));
+    }
+
+    /* ── Scrape ── */
+    async function triggerScrape() {
+        const btn = document.getElementById('scrape-btn');
+        btn.disabled = true;
+        btn.innerHTML = `<div class="spinner" style="width:12px;height:12px;border-width:2px"></div> Đang quét...`;
+
+        try {
+            const r = await fetch('/api/scrape', { method: 'POST' });
+            const d = await r.json();
+            showToast(d.message || 'Đã bắt đầu quét', 'success');
+            document.getElementById('scrape-log').classList.add('active');
+            startScrapePolling();
+        } catch (e) {
+            showToast('Lỗi kết nối server', 'error');
+            resetScrapeBtn();
+        }
+    }
+
+    function startScrapePolling() {
+        if (scrapePolling) clearInterval(scrapePolling);
+        scrapePolling = setInterval(pollScrapeStatus, 2000);
+    }
+
+    async function pollScrapeStatus() {
+        try {
+            const r = await fetch('/api/scrape/status');
+            const d = await r.json();
+            const lines = (d.logs || []).join('\n');
+            document.getElementById('scrape-log-lines').textContent = lines;
+            const el = document.getElementById('scrape-log-lines');
+            el.scrollTop = el.scrollHeight;
+
+            if (!d.in_progress) {
+                clearInterval(scrapePolling);
+                scrapePolling = null;
+                resetScrapeBtn();
+                // Reload jobs
+                allJobs = await fetchJobs();
+                await fetchStats();
+                applyFilters();
+                showToast('Quét xong! Đã cập nhật danh sách.', 'success');
+                setTimeout(() => document.getElementById('scrape-log').classList.remove('active'), 3000);
+            }
+        } catch (e) { console.warn('poll err', e); }
+    }
+
+    function resetScrapeBtn() {
+        const btn = document.getElementById('scrape-btn');
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Quét tin mới`;
+    }
+
+    /* ── File upload ── */
+    function handleFile(file) {
+        if (!file) return;
+        document.getElementById('upload-name').textContent = file.name;
+
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+                    let text = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        text += content.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    document.getElementById('cv-text').value = text.trim();
+                    showToast('Đã đọc PDF thành công', 'success');
+                } catch (err) {
+                    showToast('Không đọc được PDF', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('cv-text').value = e.target.result;
+                showToast('Đã tải CV', 'success');
+            };
+            reader.readAsText(file, 'utf-8');
+        }
+    }
+
+    // Drag and drop
+    const uploadZone = document.getElementById('upload-zone');
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file);
+    });
+
+    /* ── Utils ── */
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Boot ── */
+    init();
+</script>
+</body>
+</html>

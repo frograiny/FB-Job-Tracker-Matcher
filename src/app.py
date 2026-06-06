@@ -2,15 +2,15 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import subprocess
-import json
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from job_storage import JobDatabase
 
 app = FastAPI(title="Facebook Job Tracker API")
 
-# Enable CORS for local testing
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,12 +19,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fb_config import DATABASE_PATH as DB_PATH, DASHBOARD_PATH
-
+# Serve static files (frontend)
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Global state for scraping
 scrape_in_progress = False
 scrape_log = []
+
 
 def run_scraper_task():
     global scrape_in_progress, scrape_log
@@ -44,28 +47,26 @@ def run_scraper_task():
             clean_line = line.strip()
             if clean_line:
                 scrape_log.append(clean_line)
-                # Limit log size
                 if len(scrape_log) > 500:
                     scrape_log.pop(0)
-        
+
         process.wait()
         scrape_log.append("--- Quét tin thành công và cập nhật database ---")
-        
-        # Regenerate the HTML dashboard so it remains in sync
-        with JobDatabase() as db:
-            db.export_html()
-        
+
     except Exception as e:
         scrape_log.append(f"Lỗi hệ thống: {str(e)}")
     finally:
         scrape_in_progress = False
 
+
 @app.get("/")
 def get_dashboard():
-    if not os.path.exists(DASHBOARD_PATH):
-        with JobDatabase() as db:
-            db.export_html()
-    return FileResponse(DASHBOARD_PATH)
+    """Serve the frontend dashboard."""
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return JSONResponse({"error": "Frontend not found"}, status_code=404)
+
 
 @app.get("/api/jobs")
 def get_jobs(min_score: int = 0):
@@ -76,6 +77,7 @@ def get_jobs(min_score: int = 0):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/api/stats")
 def get_stats():
     try:
@@ -85,19 +87,21 @@ def get_stats():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/api/scrape")
 def trigger_scrape(background_tasks: BackgroundTasks):
     global scrape_in_progress
     if scrape_in_progress:
         return {"status": "running", "message": "Bot đang quét rồi!"}
-    
+
     background_tasks.add_task(run_scraper_task)
     return {"status": "started", "message": "Bắt đầu quét tin Facebook ngầm..."}
+
 
 @app.get("/api/scrape/status")
 def get_scrape_status():
     global scrape_in_progress, scrape_log
     return {
         "in_progress": scrape_in_progress,
-        "logs": scrape_log[-15:]  # Return last 15 lines of logs
+        "logs": scrape_log[-20:]  # Return last 20 lines of logs
     }
