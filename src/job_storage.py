@@ -211,6 +211,91 @@ class JobDatabase:
         )
         self._conn.commit()
 
+    def recalculate_keyword_scores(self, cv_text: str):
+        """
+        Tính toán lại điểm match_score và các kỹ năng phù hợp/thiếu cho toàn bộ job hiện có dựa trên từ khóa CV mới.
+        """
+        if not cv_text:
+            return
+
+        cv_lower = cv_text.lower()
+        
+        # Danh sách kỹ năng IT tiêu chuẩn dùng để đối khớp từ khóa
+        skills_dict = [
+            "python", "fastapi", "flask", "django", "pytorch", "tensorflow", "keras", "scikit-learn", 
+            "opencv", "react", "vue", "angular", "nodejs", "javascript", "typescript", "golang", "go",
+            "c++", "c#", ".net", "java", "sql", "mysql", "postgresql", "mongodb", "docker", "docker compose", 
+            "kubernetes", "git", "github", "linux", "deep learning", "machine learning", "artificial intelligence", 
+            "ai agent", "llm", "nlp", "computer vision", "rest api", "waf", "security", "devops", "cloud", "aws"
+        ]
+
+        # Lấy tất cả job hiện có
+        cur = self._conn.execute("SELECT id, requirements, match_score FROM job_listings")
+        rows = cur.fetchall()
+
+        for row in rows:
+            job_id = row[0]
+            reqs_str = row[1]
+            original_score = row[2] or 0
+
+            # Parse requirements
+            reqs = []
+            if reqs_str:
+                try:
+                    reqs = json.loads(reqs_str)
+                except Exception:
+                    reqs = []
+
+            if not reqs:
+                continue
+
+            # Nối các yêu cầu lại thành 1 chuỗi để tìm kiếm kỹ năng
+            req_text = " ".join(reqs).lower()
+            job_skills = [s for s in skills_dict if s in req_text]
+
+            if not job_skills:
+                continue
+
+            # Kiểm tra kỹ năng nào khớp trong CV
+            matched_skills = [s for s in job_skills if s in cv_lower]
+            missing_skills = [s for s in job_skills if s not in cv_lower]
+
+            ratio = len(matched_skills) / len(job_skills)
+            computed_score = round(ratio * 100)
+
+            # Pha trộn 70% điểm tính toán từ khóa + 30% điểm gốc
+            new_score = min(100, round(computed_score * 0.7 + original_score * 0.3))
+
+            # Lưu lại vào DB
+            self._conn.execute(
+                """UPDATE job_listings
+                   SET match_score = ?, matched_skills = ?, missing_skills = ?
+                   WHERE id = ?""",
+                (
+                    new_score,
+                    json.dumps(matched_skills, ensure_ascii=False),
+                    json.dumps(missing_skills, ensure_ascii=False),
+                    job_id
+                )
+            )
+        self._conn.commit()
+
+    def update_job_match(self, job_id: int, match_score: int, matched_skills: list, missing_skills: list, recommendation: str):
+        """Cập nhật chi tiết kết quả so khớp của AI cho một công việc cụ thể."""
+        self._conn.execute(
+            """UPDATE job_listings
+               SET match_score = ?, matched_skills = ?, missing_skills = ?, recommendation = ?
+               WHERE id = ?""",
+            (
+                match_score,
+                json.dumps(matched_skills, ensure_ascii=False),
+                json.dumps(missing_skills, ensure_ascii=False),
+                recommendation,
+                job_id
+            )
+        )
+        self._conn.commit()
+
     def get_jobs(self, min_score: int = 0, limit: int = 50) -> list[dict]:
         """Lấy danh sách job, sắp xếp theo match_score giảm dần."""
         cur = self._conn.execute(

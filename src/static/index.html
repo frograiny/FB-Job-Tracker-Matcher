@@ -895,6 +895,10 @@
     /* ── Init ── */
     async function init() {
         try {
+            const savedCv = localStorage.getItem('user_cv_text');
+            if (savedCv) {
+                document.getElementById('cv-text').value = savedCv;
+            }
             [allJobs] = await Promise.all([fetchJobs(), fetchStats()]);
             applyFilters();
         } catch (e) {
@@ -1051,6 +1055,12 @@
 
         <div class="detail-actions">
             ${(j.post_url || j.group_url) ? `<a href="${esc(j.post_url || j.group_url)}" target="_blank" rel="noopener" class="btn btn-primary">Xem bài gốc trên FB</a>` : ''}
+            <button class="btn" id="ai-reassess-btn" onclick="reassessJobWithAi(${j.id})" style="background: var(--green); border-color: transparent; color: #fff;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                Chấm điểm lại bằng AI
+            </button>
             ${j.contact ? `<button class="btn" onclick="copyContact('${j.contact.replace(/'/g, "\\'")}')">Sao chép liên hệ</button>` : ''}
             ${j.group_url && j.post_url ? `<a href="${esc(j.group_url)}" target="_blank" rel="noopener" class="source-badge">Xem nhóm</a>` : ''}
         </div>
@@ -1135,8 +1145,10 @@
                         const content = await page.getTextContent();
                         text += content.items.map(item => item.str).join(' ') + '\n';
                     }
-                    document.getElementById('cv-text').value = text.trim();
+                    const parsedText = text.trim();
+                    document.getElementById('cv-text').value = parsedText;
                     showToast('Đã đọc PDF thành công', 'success');
+                    saveCv(parsedText);
                 } catch (err) {
                     showToast('Không đọc được PDF', 'error');
                 }
@@ -1145,8 +1157,10 @@
         } else {
             const reader = new FileReader();
             reader.onload = (e) => {
-                document.getElementById('cv-text').value = e.target.result;
+                const parsedText = e.target.result;
+                document.getElementById('cv-text').value = parsedText;
                 showToast('Đã tải CV', 'success');
+                saveCv(parsedText);
             };
             reader.readAsText(file, 'utf-8');
         }
@@ -1167,6 +1181,103 @@
     function esc(str) {
         if (!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Debounce & CV Auto-Save ── */
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    async function saveCv(text) {
+        if (!text || !text.trim()) return;
+        localStorage.setItem('user_cv_text', text);
+        
+        const uploadZone = document.getElementById('upload-zone');
+        const uploadName = document.getElementById('upload-name');
+        const oldText = uploadName.textContent;
+        uploadName.textContent = "Đang đồng bộ CV...";
+        
+        try {
+            const r = await fetch('/api/cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            });
+            const d = await r.json();
+            if (r.ok) {
+                showToast('Đã lưu CV và cập nhật match score!', 'success');
+                [allJobs] = await Promise.all([fetchJobs(), fetchStats()]);
+                applyFilters();
+                // Nếu đang chọn một job, tải lại chi tiết để hiển thị điểm số keyword mới
+                if (selectedId) {
+                    const currentJob = allJobs.find(j => j.id === selectedId);
+                    if (currentJob) {
+                        renderDetail(currentJob);
+                    }
+                }
+            } else {
+                showToast(d.detail || 'Lỗi lưu CV', 'error');
+            }
+        } catch (e) {
+            showToast('Lỗi kết nối server', 'error');
+            console.error(e);
+        } finally {
+            uploadName.textContent = oldText;
+        }
+    }
+
+    const debouncedSaveCv = debounce((text) => {
+        saveCv(text);
+    }, 1500);
+
+    document.getElementById('cv-text').addEventListener('input', (e) => {
+        debouncedSaveCv(e.target.value);
+    });
+
+    document.getElementById('cv-text').addEventListener('change', (e) => {
+        saveCv(e.target.value);
+    });
+
+    async function reassessJobWithAi(jobId) {
+        const btn = document.getElementById('ai-reassess-btn');
+        if (!btn) return;
+        
+        btn.disabled = true;
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = `<div class="spinner" style="width:12px;height:12px;border-width:2px"></div> Đang phân tích AI...`;
+        
+        try {
+            const r = await fetch(`/api/jobs/${jobId}/match`, { method: 'POST' });
+            if (!r.ok) {
+                const d = await r.json();
+                throw new Error(d.detail || 'Lỗi từ server');
+            }
+            const updatedJob = await r.json();
+            
+            // Cập nhật job trong allJobs
+            const index = allJobs.findIndex(j => j.id === jobId);
+            if (index !== -1) {
+                allJobs[index] = updatedJob;
+            }
+            
+            showToast('Gemini đã hoàn tất chấm điểm!', 'success');
+            
+            // Cập nhật lại UI
+            applyFilters();
+            renderDetail(updatedJob);
+        } catch (e) {
+            showToast(e.message || 'Lỗi kết nối AI', 'error');
+            console.error(e);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = oldHtml;
+            }
+        }
     }
 
     /* ── Boot ── */
