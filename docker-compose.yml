@@ -7,14 +7,11 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Persist the SQLite database
-      - ./jobs.db:/app/jobs.db
-      - ./fb_cookies.json:/app/fb_cookies.json
-      # Persist CV files if updated
-      - ./resume/cv.txt:/app/cv.txt
-      - ./resume/cv_vi.txt:/app/cv_vi.txt
-      # Mount reports and actual applications directory
-      - ./resume/actual_applications:/app/actual_applications
+      # Mount data folder (for jobs.db, fb_cookies.json)
+      - ./data:/app/data
+      # Mount resume and CV files
+      - ./resume:/app/resume
+      # Mount reports directory
       - ./reports:/app/reports
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}

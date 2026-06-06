@@ -9,7 +9,7 @@ fb_cookies.json
 # Reorganized directories containing local data, scripts, and logs
 reports/
 debug/
-scripts/
+data/
 
 # Global file types to ignore
 *.tex

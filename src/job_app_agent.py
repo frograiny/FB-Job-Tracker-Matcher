@@ -1,5 +1,7 @@
 import asyncio
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import csv
 from dotenv import load_dotenv
 from google.antigravity import Agent, LocalAgentConfig
@@ -7,8 +9,8 @@ from google.antigravity import Agent, LocalAgentConfig
 # Tải biến môi trường từ file .env
 load_dotenv()
 
-# Đường dẫn các file liên quan
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Đường dẫn các file liên quan (BASE_DIR là thư mục gốc dự án)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CV_PATH = os.path.join(BASE_DIR, "resume", "cv.txt")
 TRACKER_PATH = os.path.join(BASE_DIR, "resume", "applications_tracker.csv")
 

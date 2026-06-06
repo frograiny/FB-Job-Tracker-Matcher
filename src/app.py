@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import subprocess
 import json
 from fastapi import FastAPI, BackgroundTasks, HTTPException
@@ -30,7 +32,7 @@ def run_scraper_task():
     scrape_log = ["--- Bắt đầu tiến trình quét tin Facebook ---"]
     try:
         # Run playwright script in the local virtualenv
-        cmd = [".venv/bin/python", "fb_job_bot.py"]
+        cmd = [".venv/bin/python", "src/fb_job_bot.py"]
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,

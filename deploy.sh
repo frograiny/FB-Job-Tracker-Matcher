@@ -46,7 +46,7 @@ deploy_systemd() {
 
     # Generate custom service file
     SERVICE_FILE="fb_job_tracker.service"
-    cp fb_job_tracker.service.template "$SERVICE_FILE"
+    cp config/fb_job_tracker.service.template "$SERVICE_FILE"
     
     # Replace placeholders
     sed -i "s|{USER}|$CURRENT_USER|g" "$SERVICE_FILE"
@@ -101,7 +101,7 @@ deploy_docker() {
 setup_cron() {
     echo -e "\n${BLUE}Đang thiết lập lịch cào tin tự động hàng ngày (Daily Auto Scraper)...${NC}"
     
-    CRON_CMD="0 8 * * * cd $WORKING_DIR && $WORKING_DIR/.venv/bin/python fb_job_bot.py --headless >> $WORKING_DIR/cron_scraper.log 2>&1"
+    CRON_CMD="0 8 * * * cd $WORKING_DIR && $WORKING_DIR/.venv/bin/python src/fb_job_bot.py --headless >> $WORKING_DIR/cron_scraper.log 2>&1"
     
     # Check if already in crontab
     (crontab -l 2>/dev/null | grep -F "fb_job_bot.py") &>/dev/null
@@ -127,7 +127,7 @@ run_dev_background() {
         return 1
     fi
 
-    nohup "$WORKING_DIR/.venv/bin/python" -m uvicorn app:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+    nohup "$WORKING_DIR/.venv/bin/python" -m uvicorn src.app:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
     
     echo -e "${GREEN}✔ Đã khởi chạy FastAPI server chạy ngầm (PID: $!).${NC}"
     echo -e "Logs được lưu tại: ${BOLD}app.log${NC}"

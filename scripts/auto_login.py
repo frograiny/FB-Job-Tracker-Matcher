@@ -8,8 +8,8 @@ from playwright_stealth import Stealth
 async def main():
     email = "adudu13572468@gmail.com"
     password = "lego123an"
-    cookies_path = "/home/truongan/my_agent_project/fb_cookies.json"
-    screenshot_path = "/home/truongan/my_agent_project/login_progress.png"
+    cookies_path = "/home/truongan/my_agent_project/data/fb_cookies.json"
+    screenshot_path = "/home/truongan/my_agent_project/debug/login_progress.png"
 
     print("Starting browser in headed mode to login to Facebook...")
     async with async_playwright() as p:

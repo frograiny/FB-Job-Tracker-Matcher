@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 """
 Facebook Job Scraper Bot — Script chạy chính.
+
 
 Flow:
 1. Load cookies Facebook → kiểm tra đăng nhập

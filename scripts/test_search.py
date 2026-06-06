@@ -1,14 +1,18 @@
 import asyncio
 import json
 import os
+import urllib.parse
 from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
 
 async def main():
     cookies_path = "/home/truongan/my_agent_project/fb_cookies.json"
-    screenshot_path = "/home/truongan/my_agent_project/joined_groups.png"
+    query = "tuyển dụng python"
+    encoded_query = urllib.parse.quote_plus(query)
+    search_url = f"https://www.facebook.com/search/posts/?q={encoded_query}"
+    screenshot_path = "/home/truongan/my_agent_project/search_debug.png"
     
-    print("Launching browser...")
+    print(f"Searching for: '{query}' at URL: {search_url}")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=False,
@@ -49,36 +53,26 @@ async def main():
         stealth = Stealth()
         page = await context.new_page()
         
-        print("Navigating to Groups page...")
-        await page.goto("https://www.facebook.com/groups/", wait_until="domcontentloaded", timeout=30000)
+        print("Navigating to Search page...")
+        await page.goto(search_url, wait_until="domcontentloaded", timeout=30000)
         await asyncio.sleep(5)
         
         await page.screenshot(path=screenshot_path)
         print(f"Screenshot saved to {screenshot_path}")
         
-        # Let's list some links that point to groups
-        group_links = await page.query_selector_all('a[href*="/groups/"]')
-        print(f"Found {len(group_links)} links containing '/groups/'. Listing group URLs:")
+        # Extract posts
+        articles = await page.query_selector_all('div[role="article"]')
+        print(f"Number of div[role='article']: {len(articles)}")
         
-        urls = set()
-        for link in group_links:
-            href = await link.get_attribute("href")
-            if href:
-                # Normalize URL
-                if href.startswith("/"):
-                    href = "https://www.facebook.com" + href
-                # Exclude common non-group feed pages
-                if "/groups/feed/" not in href and "/groups/discover/" not in href and "/groups/categories/" not in href and href != "https://www.facebook.com/groups/":
-                    # Extract the group URL path
-                    parts = href.split("/groups/")
-                    if len(parts) > 1:
-                        group_name = parts[1].split("/")[0].split("?")[0]
-                        urls.add(f"https://www.facebook.com/groups/{group_name}")
-        
-        print("\nJoined or Visited Groups:")
-        for url in urls:
-            print(f"- {url}")
-            
+        for i, article in enumerate(articles[:5]):
+            try:
+                text = await article.inner_text()
+                text = text.strip()
+                print(f"\n--- Post {i+1} (length: {len(text)}) ---")
+                print(text[:200] + "...")
+            except Exception as e:
+                print(f"Error reading article {i+1}: {e}")
+                
         await browser.close()
 
 if __name__ == "__main__":
