@@ -22,8 +22,5 @@ resume/cover_letter_*.txt
 resume/*.html
 !resume/resume.html
 !resume/resume_vi.html
-!resume/cv.html
-!resume/cv_vi.html
-!resume/cv.pdf
-!resume/cv_vi.pdf
+
 
