@@ -9,13 +9,13 @@ services:
     volumes:
       # Persist the SQLite database
       - ./jobs.db:/app/jobs.db
-      # Persist the Facebook cookies
       - ./fb_cookies.json:/app/fb_cookies.json
       # Persist CV files if updated
-      - ./cv.txt:/app/cv.txt
-      - ./cv_vi.txt:/app/cv_vi.txt
-      # Mount reports directory
-      - ./actual_applications:/app/actual_applications
+      - ./resume/cv.txt:/app/cv.txt
+      - ./resume/cv_vi.txt:/app/cv_vi.txt
+      # Mount reports and actual applications directory
+      - ./resume/actual_applications:/app/actual_applications
+      - ./reports:/app/reports
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     restart: unless-stopped

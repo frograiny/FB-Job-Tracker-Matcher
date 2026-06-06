@@ -9,8 +9,8 @@ load_dotenv()
 
 # Đường dẫn các file liên quan
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CV_PATH = os.path.join(BASE_DIR, "cv.txt")
-TRACKER_PATH = os.path.join(BASE_DIR, "applications_tracker.csv")
+CV_PATH = os.path.join(BASE_DIR, "resume", "cv.txt")
+TRACKER_PATH = os.path.join(BASE_DIR, "resume", "applications_tracker.csv")
 
 # 1. Định nghĩa các công cụ (Tools) cho Agent
 

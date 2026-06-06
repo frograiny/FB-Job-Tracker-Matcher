@@ -12,9 +12,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = "/app/data" if os.path.exists("/app/data") else BASE_DIR
 COOKIES_PATH = os.path.join(DATA_DIR, "fb_cookies.json")
 DATABASE_PATH = os.path.join(DATA_DIR, "jobs.db")
-CV_PATH = os.path.join(DATA_DIR, "cv.txt") if os.path.exists(os.path.join(DATA_DIR, "cv.txt")) else os.path.join(BASE_DIR, "cv.txt")
-CV_VI_PATH = os.path.join(DATA_DIR, "cv_vi.txt") if os.path.exists(os.path.join(DATA_DIR, "cv_vi.txt")) else os.path.join(BASE_DIR, "cv_vi.txt")
-REPORT_DIR = DATA_DIR  # Thư mục xuất báo cáo
+CV_PATH = os.path.join(DATA_DIR, "cv.txt") if os.path.exists(os.path.join(DATA_DIR, "cv.txt")) else os.path.join(BASE_DIR, "resume", "cv.txt")
+CV_VI_PATH = os.path.join(DATA_DIR, "cv_vi.txt") if os.path.exists(os.path.join(DATA_DIR, "cv_vi.txt")) else os.path.join(BASE_DIR, "resume", "cv_vi.txt")
+REPORT_DIR = os.path.join(DATA_DIR, "reports")  # Thư mục xuất báo cáo
+os.makedirs(REPORT_DIR, exist_ok=True)
 DASHBOARD_PATH = os.path.join(BASE_DIR, "job_dashboard.html")
 
 

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DINH TRUONG AN - Resume</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.25;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            color: #000;
+            text-decoration: underline;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .name {
+            font-size: 22pt;
+            font-variant: small-caps;
+            font-weight: bold;
+            margin: 0 0 2px 0;
+        }
+        .contact-info {
+            font-size: 9.5pt;
+            margin: 0;
+        }
+        section {
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: 11pt;
+            font-variant: small-caps;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            padding-bottom: 1px;
+        }
+        .subheading-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 10.5pt;
+            margin-top: 2px;
+        }
+        .subheading-row-sub {
+            display: flex;
+            justify-content: space-between;
+            font-style: italic;
+            font-size: 9.5pt;
+            margin-bottom: 2px;
+        }
+        .project-heading-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10pt;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        li {
+            font-size: 9pt;
+            margin-bottom: 2px;
+            text-align: justify;
+        }
+        .skills-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .skills-list li {
+            font-size: 9.5pt;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="name">DINH TRUONG AN</div>
+        <div class="contact-info">
+            0354160132 | 
+            <a href="mailto:truongan1203.hp@gmail.com">truongan1203.hp@gmail.com</a> | 
+            <a href="https://github.com/blackbear117">github.com/blackbear117</a> | 
+            <a href="https://github.com/frograiny">github.com/frograiny</a>
+        </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <section>
+        <div class="section-title">Education</div>
+        <div class="subheading-row">
+            <span>University of Science - VNU</span>
+            <span>Hanoi, Vietnam</span>
+        </div>
+        <div class="subheading-row-sub">
+            <span>Bachelor of Science in Computer and Information Science</span>
+            <span>Sep. 2022 -- June 2026</span>
+        </div>
+        <ul>
+            <li><strong>Core Focus:</strong> Artificial Intelligence & Machine Learning, Agentic Workflows, Web Application Development, and Software Architecture.</li>
+        </ul>
+    </section>
+
+    <!-- TECHNICAL SKILLS -->
+    <section>
+        <div class="section-title">Technical Skills</div>
+        <ul class="skills-list">
+            <li><strong>Languages:</strong> Python, C#, C/C++, SQL, Go, JavaScript, TypeScript</li>
+            <li><strong>LLM & Agent Engineering:</strong> Google Antigravity SDK, Agentic Workflows, Prompt Engineering, Structured Markdown outputs, Token Optimization</li>
+            <li><strong>Deep Learning & AI:</strong> PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM, Model Fine-tuning, Feature Extraction</li>
+            <li><strong>Web Development:</strong> React, FastAPI, Flask, Vite, REST API Design, Responsive UI/UX</li>
+            <li><strong>Systems & Architecture:</strong> Stream Processing, Async/Parallel Programming, System Architecture, Repository Pattern</li>
+            <li><strong>Cybersecurity & DevSecOps:</strong> Penetration Testing, OWASP Top 10, WAF Configuration, Burp Suite, SonarQube</li>
+            <li><strong>Frameworks & Tools:</strong> Git, Docker, Docker Compose, Linux Systems, Arduino IDE</li>
+        </ul>
+    </section>
+
+    <!-- PROJECTS -->
+    <section>
+        <div class="section-title">Projects</div>
+        
+        <!-- PROJECT 1: AI SECURITY WAF (i-LSTM Web Security) -->
+        <div class="project-heading-row">
+            <span><strong>AI Security WAF & Active Vulnerability Scanner</strong> | <em>Python, TensorFlow/Keras, Flask</em> | <a href="https://github.com/frograiny/ai_security">Link Repo</a></span>
+            <span>Jan. 2026 -- May 2026</span>
+        </div>
+        <ul>
+            <li>Developed an active vulnerability scanner and a passive Web Application Firewall (WAF) powered by a Deep Learning model (Bi-LSTM architecture) achieving <strong>99.68% accuracy</strong> in classifying payload attacks.</li>
+            <li>Implemented multi-vector vulnerability simulation payloads (SQLi, XSS, SSRF, Path Traversal) to automate system scanning and vulnerability report generation in JSON and Markdown formats.</li>
+            <li>Built a responsive web console dashboard featuring glassmorphism UI design, live threat detection, server health monitoring, and system metrics visualization.</li>
+        </ul>
+
+        <!-- PROJECT 2: REAL AUTONOMOUS AGENT -->
+        <div class="project-heading-row">
+            <span><strong>Autonomous Job Application & Recruitment AI Agent</strong> | <em>Python, Antigravity SDK, Gemini API</em></span>
+            <span>Mar. 2026 -- Jun. 2026</span>
+        </div>
+        <ul>
+            <li>Engineered an autonomous multi-tool AI Agent utilizing <strong>Google Antigravity SDK</strong> to automate CV profile parsing, job search queries, and application logging.</li>
+            <li>Designed custom functional tools for parsing text-based resumes, searching recruitment databases, and exporting formatted spreadsheet trackers (CSV).</li>
+            <li>Optimized LLM system instructions and prompt chains to generate highly tailored, ATS-friendly cover letters structured in clean Markdown.</li>
+        </ul>
+
+        <!-- PROJECT 3: CELL SEGMENTATION -->
+        <div class="project-heading-row">
+            <span><strong>Medical Cell Segmentation & Counting System</strong> | <em>Python, PyTorch, OpenCV, Flask</em></span>
+            <span>Mar. 2026 -- May 2026</span>
+        </div>
+        <ul>
+            <li>Built an end-to-end Deep Learning pipeline using <strong>U-Net</strong> architecture trained on the <strong>MoNuSeg 2018</strong> medical imaging dataset for automated cell nuclei segmentation and counting.</li>
+            <li>Engineered preprocessing modules for image patching with overlap handling and normalization, improving model convergence and segmentation accuracy on histopathological tissue samples.</li>
+            <li>Developed a Flask-based web application with dynamic diagram rendering for interactive cell analysis visualization and automated PDF report generation.</li>
+        </ul>
+
+        <!-- PROJECT 4: SEARCH ENGINE -->
+        <div class="project-heading-row">
+            <span><strong>HUS Scientific Works</strong> | <em>React, TypeScript, FastAPI, SQL, Docker</em> | <a href="https://hus-scientific-works.vercel.app/">Live Demo</a></span>
+            <span>Jan. 2026 -- Mar. 2026</span>
+        </div>
+        <ul>
+            <li>Architected a high-throughput metadata repository system for VNU academic publications using a decoupled <strong>Repository Pattern</strong> with <strong>React/TypeScript</strong> frontend and <strong>FastAPI</strong> backend.</li>
+            <li>Implemented custom React hooks for debounced search with type-safe interfaces, and integrated an AI-powered semantic search API layer for intelligent query matching.</li>
+            <li>Orchestrated full-stack deployment via <strong>Docker Compose</strong> with isolated service containers for frontend, backend, and database layers.</li>
+        </ul>
+
+        <!-- PROJECT 5: CLIPBOARD TRANSLATOR -->
+        <div class="project-heading-row">
+            <span><strong>Cross-Platform Clipboard Translator</strong> | <em>Python, Bash, System APIs</em></span>
+            <span>Sep. 2025 -- Dec. 2025</span>
+        </div>
+        <ul>
+            <li>Built a zero-dependency, cross-platform translation utility supporting Linux, macOS, and Windows via native system APIs (<code>notify-send</code>, AppleScript, PowerShell).</li>
+            <li>Implemented a Linux daemon listener that monitors text selection events in real-time, automatically translates highlighted text, and delivers results through desktop notifications.</li>
+        </ul>
+
+    </section>
+</body>
+</html>

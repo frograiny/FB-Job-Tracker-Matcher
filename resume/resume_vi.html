@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>ĐINH TRƯỜNG AN - CV</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10.5pt;
+            line-height: 1.25;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            color: #000;
+            text-decoration: underline;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .name {
+            font-size: 22pt;
+            font-variant: small-caps;
+            font-weight: bold;
+            margin: 0 0 2px 0;
+        }
+        .contact-info {
+            font-size: 9.5pt;
+            margin: 0;
+        }
+        section {
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: 11pt;
+            font-variant: small-caps;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            padding-bottom: 1px;
+        }
+        .subheading-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 10.5pt;
+            margin-top: 2px;
+        }
+        .subheading-row-sub {
+            display: flex;
+            justify-content: space-between;
+            font-style: italic;
+            font-size: 9.5pt;
+            margin-bottom: 2px;
+        }
+        .project-heading-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10pt;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        li {
+            font-size: 9pt;
+            margin-bottom: 2px;
+            text-align: justify;
+        }
+        .skills-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .skills-list li {
+            font-size: 9.5pt;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="name">ĐINH TRƯỜNG AN</div>
+        <div class="contact-info">
+            0354160132 | 
+            <a href="mailto:truongan1203.hp@gmail.com">truongan1203.hp@gmail.com</a> | 
+            <a href="https://github.com/blackbear117">github.com/blackbear117</a> | 
+            <a href="https://github.com/frograiny">github.com/frograiny</a>
+        </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <section>
+        <div class="section-title">Học vấn</div>
+        <div class="subheading-row">
+            <span>Trường Đại học Khoa học Tự nhiên - ĐHQGHN</span>
+            <span>Hà Nội, Việt Nam</span>
+        </div>
+        <div class="subheading-row-sub">
+            <span>Cử nhân Khoa học Máy tính và Thông tin</span>
+            <span>Th9. 2022 -- Th6. 2026</span>
+        </div>
+        <ul>
+            <li><strong>Trọng tâm đào tạo:</strong> Trí tuệ nhân tạo & Học sâu, Hệ thống AI Agent, Phát triển ứng dụng Web và Kiến trúc phần mềm.</li>
+        </ul>
+    </section>
+
+    <!-- TECHNICAL SKILLS -->
+    <section>
+        <div class="section-title">Kỹ năng kỹ thuật</div>
+        <ul class="skills-list">
+            <li><strong>Ngôn ngữ lập trình:</strong> Python, C#, C/C++, SQL, Go, JavaScript, TypeScript</li>
+            <li><strong>Công nghệ LLM & Agent:</strong> Google Antigravity SDK, Agentic Workflows, Prompt Engineering, Định dạng đầu ra Markdown cấu trúc, Tối ưu hóa Token tiêu thụ</li>
+            <li><strong>Học sâu & AI:</strong> PyTorch, TensorFlow/Keras, scikit-learn, OpenCV, U-Net, Bi-LSTM, Fine-tuning mô hình, Trích xuất đặc trưng</li>
+            <li><strong>Phát triển Web:</strong> React, FastAPI, Flask, Vite, Thiết kế REST API, Thiết kế Responsive UI/UX</li>
+            <li><strong>Hệ thống & Kiến trúc:</strong> Xử lý luồng dữ liệu (Stream Processing), Lập trình bất đồng bộ/Song song, Kiến trúc hệ thống, Repository Pattern</li>
+            <li><strong>An ninh mạng & DevSecOps:</strong> Đánh giá bảo mật (Penetration Testing), OWASP Top 10, Cấu hình WAF, Burp Suite, SonarQube</li>
+            <li><strong>Công cụ & Khung phát triển:</strong> Git, Docker, Docker Compose, Hệ điều hành Linux, Arduino IDE</li>
+        </ul>
+    </section>
+
+    <!-- PROJECTS -->
+    <section>
+        <div class="section-title">Dự án tiêu biểu</div>
+        
+        <!-- PROJECT 1: AI SECURITY WAF (i-LSTM Web Security) -->
+        <div class="project-heading-row">
+            <span><strong>Tường lửa WAF & Bộ quét lỗ hổng bảo mật ứng dụng AI</strong> | <em>Python, TensorFlow/Keras, Flask</em> | <a href="https://github.com/frograiny/ai_security">Link Repo</a></span>
+            <span>Th1. 2026 -- Th5. 2026</span>
+        </div>
+        <ul>
+            <li>Xây dựng công cụ quét lỗ hổng bảo mật chủ động và hệ thống Tường lửa ứng dụng Web (WAF) thụ động dựa trên mô hình Học sâu (kiến trúc Bi-LSTM) đạt độ chính xác phân loại tấn công lên đến <strong>99.68%</strong>.</li>
+            <li>Thiết lập các payload mô phỏng lỗ hổng đa vector (SQLi, XSS, SSRF, Path Traversal) để tự động hóa quét lỗi bảo mật và tạo báo cáo ở dạng JSON và Markdown.</li>
+            <li>Thiết kế giao diện bảng điều khiển trực quan (dashboard) theo phong cách Glassmorphism, hiển thị trực quan các đợt tấn công thời gian thực, sức khỏe máy chủ và chỉ số hệ thống.</li>
+        </ul>
+
+        <!-- PROJECT 2: REAL AUTONOMOUS AGENT -->
+        <div class="project-heading-row">
+            <span><strong>Hệ thống AI Agent tự động hóa tìm kiếm việc làm & tuyển dụng</strong> | <em>Python, Antigravity SDK, Gemini API</em></span>
+            <span>Th3. 2026 -- Th6. 2026</span>
+        </div>
+        <ul>
+            <li>Ứng dụng <strong>Google Antigravity SDK</strong> để phát triển AI Agent tự quản lý đa công cụ có khả năng tự động hóa phân tích CV cá nhân, truy vấn tìm kiếm việc làm và ghi nhật ký ứng tuyển.</li>
+            <li>Thiết kế các Custom Tools tích hợp khả năng đọc tài liệu thô, gọi API cơ sở dữ liệu tuyển dụng và xuất lịch sử theo dõi ứng tuyển tự động dạng CSV.</li>
+            <li>Tối ưu hóa cấu trúc chỉ thị hệ thống và chuỗi prompt nhằm sinh thư xin việc (Cover Letter) dạng Markdown chuyên nghiệp, đáp ứng hoàn hảo tiêu chí của hệ thống ATS.</li>
+        </ul>
+
+        <!-- PROJECT 3: CELL SEGMENTATION -->
+        <div class="project-heading-row">
+            <span><strong>Hệ thống phân tách và đếm tế bào y tế</strong> | <em>Python, PyTorch, OpenCV, Flask</em></span>
+            <span>Th3. 2026 -- Th5. 2026</span>
+        </div>
+        <ul>
+            <li>Xây dựng đường ống học máy hoàn chỉnh sử dụng kiến trúc mạng <strong>U-Net</strong> huấn luyện trên bộ dữ liệu ảnh y tế <strong>MoNuSeg 2018</strong> phục vụ phân tách và đếm nhân tế bào tự động.</li>
+            <li>Thiết kế module tiền xử lý ảnh (patching) xử lý chồng lấp và chuẩn hóa, tăng độ hội tụ của mô hình và cải thiện độ chính xác trên mẫu mô bệnh học.</li>
+            <li>Phát triển dashboard dựa trên Flask hiển thị biểu đồ phân tích động trực quan hóa mẫu tế bào và tích hợp công cụ tự động xuất báo cáo định dạng PDF.</li>
+        </ul>
+
+        <!-- PROJECT 4: SEARCH ENGINE -->
+        <div class="project-heading-row">
+            <span><strong>HUS Scientific Works</strong> | <em>React, TypeScript, FastAPI, SQL, Docker</em> | <a href="https://hus-scientific-works.vercel.app/">Link sản phẩm</a></span>
+            <span>Th1. 2026 -- Th3. 2026</span>
+        </div>
+        <ul>
+            <li>Thiết kế kiến trúc kho lưu trữ siêu dữ liệu hiệu năng cao cho các công bố khoa học của Đại học Quốc gia bằng mô hình **Repository Pattern** tách biệt giữa React/TypeScript (Frontend) và FastAPI (Backend).</li>
+            <li>Xây dựng các custom React hooks tối ưu hóa tìm kiếm (debounced search) với kiểu dữ liệu type-safe, tích hợp lớp API tìm kiếm ngữ nghĩa bằng AI.</li>
+            <li>Đóng gói triển khai toàn bộ hệ thống bằng **Docker Compose** với các container dịch vụ biệt lập giữa frontend, backend và database.</li>
+        </ul>
+
+        <!-- PROJECT 5: CLIPBOARD TRANSLATOR -->
+        <div class="project-heading-row">
+            <span><strong>Công cụ dịch thuật clipboard đa nền tảng chạy ngầm</strong> | <em>Python, Bash, System APIs</em></span>
+            <span>Th9. 2025 -- Th12. 2025</span>
+        </div>
+        <ul>
+            <li>Phát triển công cụ dịch thuật không phụ thuộc thư viện ngoài hoạt động mượt mà trên Linux, macOS và Windows thông qua API gốc (notify-send, AppleScript, PowerShell).</li>
+            <li>Triển khai dịch vụ daemon trên Linux theo dõi trực tiếp sự kiện chọn văn bản của hệ thống, tự động dịch và đẩy kết quả phản hồi qua thông báo nổi màn hình.</li>
+        </ul>
+
+    </section>
+</body>
+</html>
