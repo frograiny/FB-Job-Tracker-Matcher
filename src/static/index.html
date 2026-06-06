@@ -895,9 +895,20 @@
     /* ── Init ── */
     async function init() {
         try {
-            const savedCv = localStorage.getItem('user_cv_text');
-            if (savedCv) {
-                document.getElementById('cv-text').value = savedCv;
+            // Load CV từ server trước
+            const cvResponse = await fetch('/api/cv');
+            if (cvResponse.ok) {
+                const cvData = await cvResponse.json();
+                if (cvData.text && cvData.text.trim()) {
+                    document.getElementById('cv-text').value = cvData.text;
+                    localStorage.setItem('user_cv_text', cvData.text);
+                }
+            } else {
+                // Nếu server lỗi, dùng localStorage làm fallback
+                const savedCv = localStorage.getItem('user_cv_text');
+                if (savedCv) {
+                    document.getElementById('cv-text').value = savedCv;
+                }
             }
             [allJobs] = await Promise.all([fetchJobs(), fetchStats()]);
             applyFilters();

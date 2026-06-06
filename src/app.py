@@ -115,6 +115,18 @@ def get_scrape_status():
     }
 
 
+@app.get("/api/cv")
+def get_cv():
+    try:
+        cv_text = ""
+        if os.path.exists(CV_PATH):
+            with open(CV_PATH, "r", encoding="utf-8") as f:
+                cv_text = f.read()
+        return JSONResponse({"text": cv_text})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/cv")
 def update_cv(cv_req: CvRequest):
     try:
