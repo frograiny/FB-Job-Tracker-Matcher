@@ -52,8 +52,8 @@ def run_scraper_task():
         scrape_log.append("--- Quét tin thành công và cập nhật database ---")
         
         # Regenerate the HTML dashboard so it remains in sync
-        db = JobDatabase()
-        db.export_html()
+        with JobDatabase() as db:
+            db.export_html()
         
     except Exception as e:
         scrape_log.append(f"Lỗi hệ thống: {str(e)}")
@@ -63,15 +63,15 @@ def run_scraper_task():
 @app.get("/")
 def get_dashboard():
     if not os.path.exists(DASHBOARD_PATH):
-        db = JobDatabase()
-        db.export_html()
+        with JobDatabase() as db:
+            db.export_html()
     return FileResponse(DASHBOARD_PATH)
 
 @app.get("/api/jobs")
 def get_jobs(min_score: int = 0):
     try:
-        db = JobDatabase()
-        jobs = db.get_jobs(min_score=min_score, limit=999)
+        with JobDatabase() as db:
+            jobs = db.get_jobs(min_score=min_score, limit=999)
         return JSONResponse(content=jobs)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -79,8 +79,8 @@ def get_jobs(min_score: int = 0):
 @app.get("/api/stats")
 def get_stats():
     try:
-        db = JobDatabase()
-        stats = db.get_stats()
+        with JobDatabase() as db:
+            stats = db.get_stats()
         return JSONResponse(content=stats)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
