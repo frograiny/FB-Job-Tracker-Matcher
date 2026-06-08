@@ -4,6 +4,10 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 
+for stream in (sys.stdout, sys.stderr):
+    if hasattr(stream, "reconfigure"):
+        stream.reconfigure(encoding="utf-8", errors="replace")
+
 from cv_profile import extract_cv_profile, score_text_against_profile, summarize_profile
 from fb_config import BASE_DIR, CV_PATH
 from job_storage import JobDatabase
