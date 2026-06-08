@@ -43,8 +43,35 @@ def search_job_postings(query: str) -> str:
     Args:
         query: Từ khóa tìm kiếm, ví dụ: 'Thực tập sinh Python', 'AI Intern'.
     """
-    # Vì đây là ví dụ giả lập, chúng ta trả về danh sách các công việc mẫu có thật/tiêu biểu
-    # Trong môi trường thực tế, tool này có thể gọi API tìm việc hoặc Google Search API.
+    # 1. Thử tìm kiếm trong SQLite Database thực tế trước
+    try:
+        with JobDatabase() as db:
+            db_jobs = db.get_jobs(min_score=0, limit=100)
+            result_jobs = []
+            for job in db_jobs:
+                title = (job.get("position") or "").lower()
+                company = (job.get("company") or "").lower()
+                desc = (job.get("requirements") or "").lower()
+                q = query.lower()
+                if q in title or q in company or q in desc:
+                    result_jobs.append(job)
+            
+            if result_jobs:
+                output = []
+                for job in result_jobs[:10]:
+                    output.append(
+                        f"- ID: {job.get('id')}\n"
+                        f"  Công ty: {job.get('company') or 'Unknown'}\n"
+                        f"  Vị trí: {job.get('position') or 'Unknown'}\n"
+                        f"  Địa điểm: {job.get('location') or 'Chưa xác định'}\n"
+                        f"  Mô tả: {job.get('requirements') or 'Không có mô tả chi tiết'}\n"
+                        f"  Link: {job.get('post_url') or ''}\n"
+                    )
+                return "\n".join(output)
+    except Exception:
+        pass
+
+    # 2. Fallback sang dữ liệu mẫu tiêu biểu nếu database trống
     jobs = [
         {
             "id": "1",
