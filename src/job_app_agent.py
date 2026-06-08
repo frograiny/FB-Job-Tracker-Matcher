@@ -4,15 +4,25 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import csv
 from dotenv import load_dotenv
-from google.antigravity import Agent, LocalAgentConfig
+
+try:
+    from google.antigravity import Agent, LocalAgentConfig
+except ImportError:
+    Agent = None
+    LocalAgentConfig = None
+
+from cv_profile import extract_cv_profile, score_text_against_profile, summarize_profile
+from fb_config import BASE_DIR, CV_PATH
+from job_storage import JobDatabase
 
 # Tải biến môi trường từ file .env
 load_dotenv()
 
 # Đường dẫn các file liên quan (BASE_DIR là thư mục gốc dự án)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CV_PATH = os.path.join(BASE_DIR, "resume", "cv.txt")
-TRACKER_PATH = os.path.join(BASE_DIR, "resume", "applications_tracker.csv")
+TRACKER_PATH = os.getenv(
+    "APPLICATION_TRACKER_PATH",
+    os.path.join(BASE_DIR, "resume", "applications_tracker.csv"),
+)
 
 # 1. Định nghĩa các công cụ (Tools) cho Agent
 
@@ -120,6 +130,11 @@ async def run_interactive_loop(agent):
 
 # 4. Hàm chạy Agent chính
 async def run_agent():
+    if Agent is None or LocalAgentConfig is None:
+        raise RuntimeError(
+            "Google Antigravity SDK is not installed. Install/configure it before running job_app_agent.py."
+        )
+
     config = LocalAgentConfig(
         tools=[read_cv, search_job_postings, log_application],
         system_instructions=SYSTEM_INSTRUCTIONS,

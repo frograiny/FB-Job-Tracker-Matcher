@@ -2,14 +2,18 @@ import asyncio
 import json
 import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
+from fb_config import BASE_DIR, COOKIES_PATH
 
 async def main():
-    email = "adudu13572468@gmail.com"
-    password = "lego123an"
-    cookies_path = "/home/truongan/my_agent_project/data/fb_cookies.json"
-    screenshot_path = "/home/truongan/my_agent_project/debug/login_progress.png"
+    email = os.getenv("FB_EMAIL", "")
+    password = os.getenv("FB_PASSWORD", "")
+    cookies_path = COOKIES_PATH
+    debug_dir = os.path.join(BASE_DIR, "debug")
+    os.makedirs(debug_dir, exist_ok=True)
+    screenshot_path = os.path.join(debug_dir, "login_progress.png")
 
     print("Starting browser in headed mode to login to Facebook...")
     async with async_playwright() as p:
@@ -54,18 +58,21 @@ async def main():
         # Check if email input exists
         email_input = await page.query_selector('input[name="email"], input[id="email"]')
         if email_input:
-            print("Email input found! Filling credentials...")
-            await email_input.fill(email)
-            await asyncio.sleep(1)
-            
-            pass_input = await page.query_selector('input[name="pass"], input[id="pass"]')
-            if pass_input:
-                await pass_input.fill(password)
+            if email and password:
+                print("Email input found! Filling credentials from environment...")
+                await email_input.fill(email)
                 await asyncio.sleep(1)
-                print("Pressing Enter to login...")
-                await pass_input.press("Enter")
+                
+                pass_input = await page.query_selector('input[name="pass"], input[id="pass"]')
+                if pass_input:
+                    await pass_input.fill(password)
+                    await asyncio.sleep(1)
+                    print("Pressing Enter to login...")
+                    await pass_input.press("Enter")
+                else:
+                    print("Password input not found!")
             else:
-                print("Password input not found!")
+                print("Email input found. Set FB_EMAIL and FB_PASSWORD, or log in manually in the browser window.")
         else:
             print("Email input not found. You might be already logged in or there is a cookie banner / redirect.")
 
@@ -106,6 +113,7 @@ async def main():
             await asyncio.sleep(5)
             
             cookies = await context.cookies()
+            os.makedirs(os.path.dirname(cookies_path), exist_ok=True)
             with open(cookies_path, "w", encoding="utf-8") as f:
                 json.dump(cookies, f, indent=2)
             print(f"Cookies saved successfully to {cookies_path}")

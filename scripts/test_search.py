@@ -1,16 +1,21 @@
 import asyncio
 import json
 import os
+import sys
 import urllib.parse
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
+from fb_config import BASE_DIR, COOKIES_PATH
 
 async def main():
-    cookies_path = "/home/truongan/my_agent_project/fb_cookies.json"
-    query = "tuyển dụng python"
+    cookies_path = COOKIES_PATH
+    query = os.getenv("FB_SEARCH_QUERY", "tuyển dụng python")
     encoded_query = urllib.parse.quote_plus(query)
     search_url = f"https://www.facebook.com/search/posts/?q={encoded_query}"
-    screenshot_path = "/home/truongan/my_agent_project/search_debug.png"
+    debug_dir = os.path.join(BASE_DIR, "debug")
+    os.makedirs(debug_dir, exist_ok=True)
+    screenshot_path = os.path.join(debug_dir, "search_debug.png")
     
     print(f"Searching for: '{query}' at URL: {search_url}")
     async with async_playwright() as p:

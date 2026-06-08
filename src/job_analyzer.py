@@ -29,8 +29,18 @@ from fb_config import (
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# Khởi tạo Gemini client
-_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+_client: Optional[genai.Client] = None
+
+
+def _get_client() -> genai.Client:
+    """Create the Gemini client lazily so imports do not require credentials."""
+    global _client
+    if _client is None:
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY is not configured")
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 
 def _parse_json_response(text: str) -> Optional[dict]:
@@ -66,7 +76,7 @@ async def _call_gemini_with_retry(prompt: str, max_retries: int = 3) -> Optional
     for attempt in range(max_retries):
         try:
             response = await asyncio.to_thread(
-                _client.models.generate_content,
+                _get_client().models.generate_content,
                 model=GEMINI_MODEL,
                 contents=prompt,
                 config=types.GenerateContentConfig(

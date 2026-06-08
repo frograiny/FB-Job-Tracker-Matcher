@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from job_storage import JobDatabase
 from pydantic import BaseModel
-from fb_config import CV_PATH, CV_VI_PATH
+from fb_config import BASE_DIR, CV_PATH, CV_VI_PATH
 from job_analyzer import match_with_cv
 import json
 
@@ -42,14 +42,18 @@ def run_scraper_task():
     scrape_in_progress = True
     scrape_log = ["--- Bắt đầu tiến trình quét tin Facebook ---"]
     try:
-        # Use sys.executable to work both locally (venv) and in Docker
-        cmd = [sys.executable, "src/fb_job_bot.py"]
+        # Use absolute paths so the dashboard can be started from any cwd.
+        script_path = os.path.join(BASE_DIR, "src", "fb_job_bot.py")
+        cmd = [sys.executable, script_path]
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            bufsize=1
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+            cwd=BASE_DIR,
         )
         for line in process.stdout:
             clean_line = line.strip()

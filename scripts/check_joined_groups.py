@@ -1,12 +1,17 @@
 import asyncio
 import json
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
+from fb_config import BASE_DIR, COOKIES_PATH
 
 async def main():
-    cookies_path = "/home/truongan/my_agent_project/data/fb_cookies.json"
-    screenshot_path = "/home/truongan/my_agent_project/debug/joined_groups.png"
+    cookies_path = COOKIES_PATH
+    debug_dir = os.path.join(BASE_DIR, "debug")
+    os.makedirs(debug_dir, exist_ok=True)
+    screenshot_path = os.path.join(debug_dir, "joined_groups.png")
     
     print("Launching browser...")
     async with async_playwright() as p:

@@ -84,11 +84,31 @@ class JobDatabase:
 
     def connect(self):
         """Mở connection và tạo bảng nếu chưa có."""
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
         self._conn = sqlite3.connect(self.db_path)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(SCHEMA_SQL)
+        self._migrate_unique_job_posts()
         self._conn.commit()
         logger.info(f"Kết nối database: {self.db_path}")
+
+    def _migrate_unique_job_posts(self):
+        """Ensure each raw post can create at most one job listing."""
+        self._conn.execute(
+            """
+            DELETE FROM job_listings
+            WHERE id NOT IN (
+                SELECT MAX(id)
+                FROM job_listings
+                GROUP BY post_hash
+            )
+            """
+        )
+        self._conn.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_jobs_post_hash_unique ON job_listings(post_hash)"
+        )
 
     def close(self):
         """Đóng connection."""
